@@ -26,5 +26,5 @@ SQL是关系数据库的标准查询语言。本周我们学习了如何定义�
 ```sql
 SELECT DISTINCT T.name
 FROM instructor AS T, instructor AS S
-where T.salary > S.salary AND S.dept_name = '会计';
+WHERE T.salary > S.salary AND S.dept_name = '会计';
 ```
