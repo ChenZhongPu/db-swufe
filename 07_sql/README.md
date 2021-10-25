@@ -11,7 +11,7 @@ ON student.id = takes.id;
 
 ```sql
 SELECT *
-FROM student NATURAL LEFT JOIN takes
+FROM student LEFT JOIN takes ON true
 WHERE student.id = takes.id;
 ```
 
