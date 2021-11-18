@@ -23,3 +23,6 @@ except Exception as sqle:
     conn.rollback()
 
 ## TODO: delete
+
+cur.close()
+conn.close()
