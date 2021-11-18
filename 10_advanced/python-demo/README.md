@@ -15,3 +15,6 @@ Install `psycopg2` driver, which allows connection to PostgreSQL:
 ```sh
 pip3 install psycopg2-binary 
 ```
+
+## Step 2
+Run `python3 main.py`.
