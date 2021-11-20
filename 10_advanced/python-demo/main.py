@@ -1,7 +1,7 @@
 import psycopg2
 
 # Connect to your postgres DB
-conn = psycopg2.connect(host="localhost", port=5432, dbname="mydb", user="postgres")
+conn = psycopg2.connect(host="localhost", port=5432, dbname="mydb", user="postgres", password="")
 
 # Open a cursor to perform database operations
 cur = conn.cursor()
