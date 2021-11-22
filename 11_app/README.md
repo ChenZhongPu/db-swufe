@@ -17,16 +17,7 @@ pip install Flask
 ```
 
 ## Step 2
-For `Bash`:
-
+Run the application:
 ```sh
-export FLASK_APP=hello
-flask run
-```
-
-For Windows's `CMD`:
-
-```sh
-set FLASK_APP=hello
 flask run
 ```
