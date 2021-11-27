@@ -10,6 +10,6 @@
 <br/>
 <a href="hello-servlet">Hello Servlet</a>
 <br/>
-<a href="/hello?b=900">PG</a>
+<a href="hello?b=900">PG</a>
 </body>
 </html>
