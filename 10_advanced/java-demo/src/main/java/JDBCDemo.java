@@ -9,6 +9,7 @@ public class JDBCDemo {
         try (Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/mydb",
                 "postgres", "")) {
 //            testSelect(con);
+            testSelect2(con);
 //            testUpdate(con);
 //            testInsert(con);
             // TODO: implement the delete
@@ -32,6 +33,20 @@ public class JDBCDemo {
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }
+    }
+
+    private static void testSelect2(Connection con) throws SQLException {
+        String selectSql = "SELECT * FROM department";
+        try (PreparedStatement pstmt = con.prepareStatement(selectSql)) {
+            try (ResultSet resultSet = pstmt.executeQuery()) {
+                while (resultSet.next()) {
+                    System.out.println(resultSet.getString("dept_name"));
+                    System.out.println(resultSet.getString("building"));
+                    System.out.println(resultSet.getDouble("budget"));
+                    System.out.println("----");
+                }
+            }
         }
     }
 
