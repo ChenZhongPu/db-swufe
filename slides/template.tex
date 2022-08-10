@@ -1,0 +1,101 @@
+\documentclass[aspectratio=169, 14pt]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{xeCJK}
+\usepackage{tipa}
+\usepackage{graphicx}
+\usepackage{transparent}
+\usepackage[ruled, lined, linesnumbered, commentsnumbered]{algorithm2e}
+\usepackage{tikz}
+\usetikzlibrary{calc,shadows.blur}
+\usetikzlibrary{matrix,backgrounds}
+\usepackage{minted}
+\usepackage{csquotes}
+\usepackage{outlines}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    }
+\urlstyle{same}
+\usetheme{metropolis}
+\metroset{block=fill}
+\usecolortheme{default}
+\definecolor{darkmidnightblue}{rgb}{0.0, 0.2, 0.4}
+\definecolor{LightGray}{gray}{0.9}
+
+
+%------------------------------------------------------------
+%This block of code defines the information to appear in the
+%Title page
+\title[Database Principles and Applications] %optional
+{数据库原理与应用}
+
+\subtitle{XXX}
+
+\author[CHEN Zhongpu] % (optional)
+{CHEN Zhongpu}
+
+\institute[] % (optional)
+{
+  School of Computing and Artificial Intelligence \\
+  \href{mailto:zpchen@swufe.edu.cn}{zpchen@swufe.edu.cn}
+}
+
+\date[] % (optional)
+{SWUFE, Fall 2022}
+
+%End of title page configuration block
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%The next block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+
+% \AtBeginSection[]
+% {
+%   \begin{frame}
+%     \frametitle{Table of Contents}
+%     \tableofcontents[currentsection]
+%   \end{frame}
+% }
+%------------------------------------------------------------
+
+
+\begin{document}
+
+%The next statement creates the title page.
+\frame{\titlepage}
+
+%---------------------------------------------------------
+%This block of code is for the table of contents after
+%the title page
+% \begin{frame}
+% \frametitle{Table of Contents}
+% \tableofcontents
+% \end{frame}
+%--------------------------------------------------------
+\begin{frame}
+    \Large $$Data\ Structure + Algorithm = Program$$
+\end{frame}
+
+{
+    % \usebackgroundtemplate{\transparent{0.3}{\begin{picture}
+    %     \includegraphics[height=0.7\paperheight]{cover}
+    % \end{picture}    
+    % }}
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] 
+  \node[opacity=0.3, at=(current page.south east),anchor=south east, yshift=2cm,xshift=4cm] {
+    \includegraphics[height=0.6\paperheight]{cover}};
+}
+    \begin{frame}
+        \section{\textcolor{darkmidnightblue}{xxx}}
+    \end{frame}
+
+}
+
+\end{document}
