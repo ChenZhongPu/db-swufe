@@ -176,4 +176,88 @@
         \includegraphics[height=0.85\paperheight]{image/feishu}
     \end{columns}
 \end{frame}
+
+\begin{frame}
+    \frametitle{评价标准}
+    
+    \begin{tikzpicture}
+        \colorlet{good}{green!75!black}
+        \colorlet{bad}{red}
+        \colorlet{neutral}{black!60}
+        \colorlet{none}{blue!75!black}
+      
+        \node[align=center,text width=3cm]{考核};
+      
+        \begin{scope}[line width=4mm,rotate=270]
+          \draw[good]          (180:2cm) arc (180:324:2cm);
+          \draw[neutral]       (-36:2cm) arc (-36:0:2cm);
+          \draw[bad]  (0:2cm)  arc (0:108:2cm);
+          \draw[none] (108:2cm) arc (108:180:2cm);
+      
+          \newcount\mycount
+          \foreach \angle in {0,72,...,3599}
+          {
+            \mycount=\angle\relax
+            \divide\mycount by 10\relax
+            \draw[black!15,thick] (\the\mycount:18mm) -- (\the\mycount:22mm);
+          }
+      
+          \draw (0:2.2cm) node[below] {平时表现 (10\%)};
+          \draw (-90:2.2cm) node[left] {作业 (40\%)};
+          \draw (65:2.2cm) node[right] {期末考试 (30\%)};
+          \draw (130:2.2cm) node[right] {Project (20\%)};
+        \end{scope}
+        % \draw[gray] (0,0) circle (2.2cm) circle (1.8cm);
+      \end{tikzpicture}
+      \begin{tikzpicture}
+        \node[fill=red!80, text=white, blur shadow={shadow xshift=-0.5ex},
+        text width=8em,anchor=south west,rounded corners, ]
+        {严禁抄袭！
+        };
+      \end{tikzpicture}
+\end{frame}
+\begin{frame}
+    \frametitle{软件工具}    
+    PostgreSQL 14: \emph{The World's Most Advanced Open Source Relational Database}
+
+    \includegraphics[width=.9\paperwidth]{image/pg-home}
+\end{frame}
+
+\begin{frame}
+\href{https://db-engines.com/en/ranking}{DB-Engines Ranking} 
+
+\begin{table}
+    \caption{DB Rank}
+    \begin{tabular}{lll}
+      \toprule
+      Rank & DBMS & Database Model \\
+      \midrule
+      1 & \textcolor{blue}{Oracle} & Relational \\
+      2 & \textcolor{blue}{MySQL} & Relational \\
+      3 & \textcolor{blue}{SQL Server} & Relational \\
+      4 & \textcolor{blue}{PostgreSQL} & Relational \\
+      5 & \textcolor{blue}{MongoDB} & Document \\
+      6 & \textcolor{blue}{Redis} & Key value \\
+      \bottomrule
+    \end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}
+    \includegraphics[width=.9\paperwidth]{image/pg-mysql1}
+    \begin{itemize}
+        \item 会什么选什么。PG 功能强大，但是我只会玩 MySQL 所以我用 MySQL 。
+        \item 选 mysql，用 pg 的人一般不会有这个疑问。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{软件工具}    
+\href{https://www.jetbrains.com/datagrip/}{DataGrip}，Navicat，pgAdmin，...
+
+\begin{center}
+    \includegraphics[width=.55\paperwidth]{image/datagrip}
+\end{center}
+
+\end{frame}
 \end{document}
