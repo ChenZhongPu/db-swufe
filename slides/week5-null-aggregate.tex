@@ -333,6 +333,27 @@ FROM test1;
 
 \end{frame}
 
+\begin{frame}[fragile]
+    \frametitle{练习}
+使用 \texttt{case} 表达式重写下面的 SQL 语句：
+
+\begin{minted}[bgcolor=LightGray]{sql}
+SELECT name, coalesce(salary, 0)
+FROM instructor;
+\end{minted} 
+
+\pause
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT name,
+       CASE
+           WHEN salary is null THEN 0
+           ELSE salary
+       END
+FROM instructor;
+\end{minted}
+
+\end{frame}
+
 \begin{frame}
     \section{\textcolor{darkmidnightblue}{2. 聚集函数}} 
 Aggregate functions: $x = f(X)$
@@ -715,7 +736,7 @@ WHERE avg_salary > 42000;
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{3.2 Set membership}
+    \frametitle{3.2 集合成员资格 (set membership)}
     \begin{columns}
         \column{0.2\textwidth}
         \begin{tikzpicture}
@@ -973,4 +994,202 @@ ORDER BY random() LIMIT 5;
 请自行查阅文档，理解 \texttt{order by random()} 的含义。
 
 \end{frame}
+
+\begin{frame}
+    \section{\textcolor{darkmidnightblue}{4. 嵌套子查询 (2)}}  
+    Nested sub-queries：\alert{select-from-where} 嵌套在另一个查询中
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{4.1 标量子查询}
+    标量子查询 (scalar sub-query) 只返回包含\textbf{单个属性的单个元组}，能出现在 SQL 中的任意地方。
+
+\begin{minted}[baselinestretch=1,bgcolor=LightGray]{sql}
+
+SELECT name FROM instructor
+WHERE salary > (SELECT min(salary)
+                FROM instructor
+                WHERE dept_name = 'History');
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+ 列出每个学院及其对应的教师人数。
+
+ \begin{minted}[baselinestretch=1,bgcolor=LightGray]{sql}
+-- 请用 GROUP BY 重写
+SELECT dept_name,
+    (SELECT count(*)
+    FROM instructor
+    WHERE department.dept_name = instructor.dept_name)
+    as num_instructor
+FROM department;
+ \end{minted}
+
+我们也能注意到可以在子查询的 \texttt{where} 子句中使用外层查询的 \alert{correlation name}，此时该子查询被称为 \textbf{相关子查询} (correlated subquery)。
+ 
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{4.2 空关系测试}
+使用 \alert{exists} 测试子查询返回的关系是否为空。
+
+\begin{minted}[baselinestretch=1,bgcolor=LightGray]{sql}
+SELECT EXISTS(SELECT 1 FROM instructor);
+\end{minted}
+
+\pause
+\textbf{例子}：找到修过ID为11011的老师的课程的学生总数。
+\begin{itemize}
+    \item \texttt{\textbf{takes}(course\_id, sec\_id, semester, year, building, room\_number, time\_slot\_id)}
+    \item \texttt{\textbf{teaches}(ID, course\_id, sec\_id, semester, year)}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+
+\begin{minted}[bgcolor=LightGray]{sql}
+/*
+方法一：使用 in
+*/
+SELECT count(DISTINCT ID)
+FROM takes
+WHERE (course_id, sec_id, semester, year)
+IN (SELECT course_id, sec_id, semester, year
+    FROM teaches
+    WHERE teaches.id = '10101');    
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{minted}[bgcolor=LightGray]{sql}
+/*
+方法二：使用 exists
+*/
+SELECT count(DISTINCT ID)
+FROM takes
+WHERE EXISTS(SELECT 1 FROM teaches
+    WHERE teaches.id = '10101'
+    AND takes.course_id = teaches.course_id
+    AND takes.sec_id = teaches.sec_id
+    AND takes.semester = teaches.semester
+    AND takes.year = teaches.year);
+    \end{minted}
+
+\end{frame}
+
+{\setbeamercolor{palette primary}{fg=black, bg=yellow}
+\begin{frame}[standout]
+  如果子查询的结果较多，建议使用 exists，而不是 in。
+\end{frame}
+}
+
+\begin{frame}[fragile]
+    \frametitle{练习}
+阅读课本 P.106，试用多表查询实现下面的嵌套查询。
+
+\begin{minted}[bgcolor=LightGray]{sql}
+SELECT count(DISTINCT ID)
+FROM takes
+WHERE EXISTS(SELECT 1 FROM teaches
+    WHERE teaches.id = '10101'
+    AND takes.course_id = teaches.course_id
+    AND takes.sec_id = teaches.sec_id
+    AND takes.semester = teaches.semester
+    AND takes.year = teaches.year);
+    \end{minted}
+
+\end{frame}
+
+{\setbeamercolor{palette primary}{fg=black, bg=yellow}
+\begin{frame}[standout]
+只要涉及多表，多表查询是万能的。
+\end{frame}
+}
+
+\begin{frame}[fragile]
+    \frametitle{4.3 with 子句}
+
+\alert{with} 字句定义了一个临时的关系，用于当前查询。    
+
+\begin{minted}[bgcolor=LightGray]{sql}
+WITH max_buedget(value) AS
+    (SELECT max(budget)
+     FROM department)
+SELECT budget
+FROM department, max_buedget
+WHERE department.budget = max_buedget.value;
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+
+\begin{minted}[bgcolor=LightGray]{sql}
+-- 列出所有工资总额大于所有系平均工资总额的系
+WITH dept_total (dept_name, value) AS
+    (SELECT dept_name, sum(salary)
+     FROM instructor
+     GROUP BY dept_name),
+    dept_total_avg(value) as
+        (SELECT avg(value)
+         from dept_total)
+SELECT dept_name
+FROM dept_total, dept_total_avg
+WHERE dept_total.value > dept_total_avg.value;
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{minted}[bgcolor=LightGray]{sql}
+-- 如果不使用 with 子句
+SELECT dept_name
+FROM instructor
+GROUP BY dept_name
+HAVING sum(salary) > (SELECT avg(value)
+                        FROM (SELECT sum(salary)
+                            FROM instructor
+                            GROUP BY dept_name)
+                        AS sum_salary(value));
+                        \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{练习}
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+CASE
+    WHEN condition1 THEN result1
+    WHEN condition2 THEN result2
+    WHEN conditionN THEN resultN
+    ELSE result
+END;
+    \end{minted}
+
+    考虑关系模式 marks（ID, score），并规定如果 score < 60 等级为 C，60 $\leq$ score < 80 等级为 B，score $\geq$ 80 等级为 A。
+
+    \textbf{问题}：显示不同成绩等级的学生总数。
+
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \begin{minted}[bgcolor=LightGray]{sql}
+WITH grades AS (
+    SELECT ID,
+        CASE
+            WHEN score < 60 THEN 'C'
+            WHEN score >= 80 THEN 'A'
+            ELSE 'B'
+        END AS grade
+    FROM marks
+)
+SELECT grade, count(ID)
+FROM grades
+GROUP BY grade;
+    \end{minted}
+
+\end{frame}
+
 \end{document}

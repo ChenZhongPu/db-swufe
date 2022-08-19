@@ -3,6 +3,7 @@
 \usepackage{xeCJK}
 \usepackage{graphicx}
 \usepackage{transparent}
+\usepackage{amsmath}
 \usepackage[ruled, lined, linesnumbered, commentsnumbered]{algorithm2e}
 \usepackage{pgfplots}
 \usepackage{tikz}
@@ -302,7 +303,7 @@ SELECT 'I''m good. "Good"?'
     字符串在SQL标准中是区分大小写的，即 \texttt{china} 不等于 \texttt{CHINA}：
 \begin{minted}[bgcolor=LightGray]{sql} 
 /*
- MySQL 和 SQLServer 不区分
+ MySQL 和 SQLServer 不区分, PG 区分
 */
 SELECT 'china' = 'CHINA';
 \end{minted}
@@ -406,6 +407,7 @@ PG中默认的转义字符是反斜线\textbackslash，英文 backslash。
 
 \begin{frame}[fragile]
     \begin{minted}[bgcolor=LightGray]{python} 
+# Python
 s = 'database is \n very fun'
 print(s)
     \end{minted}
@@ -590,4 +592,42 @@ WHERE semester = 'Spring' AND year = 2018);
     \href{https://github.com/ChenZhongPu/db-swufe/tree/master/04_lab_sql}{04. Lab SQL}
 
 \end{frame}
+
+\begin{frame}
+    \frametitle{case 表达式}
+
+    考虑关系模式 marks(id, score)，并规定如果 score < 60 等级为 C，60 $\leq$ score < 80 等级为 B，score $\geq$ 80 等级为 A。
+
+    \textbf{问题}：基于 marks 关系，显示每个学生的成绩等级。
+    
+\[
+output = \begin{cases}
+    A, & \text{if $score \geq 80$}; \\
+    B, & \text{if $80 > score \geq 60$}; \\
+    C, & \text{if $score < 60$}.
+\end{cases}
+\]
+\end{frame}
+\begin{frame}[fragile]
+    \begin{minted}[bgcolor=LightGray, baselinestretch=.9]{sql}
+CASE
+    WHEN condition1 THEN result1
+    WHEN condition2 THEN result2
+    WHEN conditionN THEN resultN
+    ELSE result
+END;
+    \end{minted}
+
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT ID,
+    CASE
+        WHEN score < 60 THEN 'C'
+        WHEN score >= 80 THEN 'A'
+        ELSE 'B'
+    END
+FROM marks;
+    \end{minted}
+
+\end{frame}
+
 \end{document}
