@@ -211,10 +211,11 @@
 \begin{frame}
 
 \begin{itemize}
+    \item \texttt{\textbf{course}(course\_id, title, dept\_name, credits)}
     \item \texttt{\textbf{student}(ID, name, dept\_name, tot\_cred)}
     \item \texttt{\textbf{advisor}(s\_id, i\_id)}
     \item \texttt{\textbf{section}(course\_id, sec\_id, semester, year, building, room\_number, time\_slot id)}
-    \item \texttt{\textbf{takes}(course\_id, sec\_id, semester, year, building, room\_number, time\_slot\_id)}
+    \item \texttt{\textbf{takes}(ID, course\_id, sec\_id, semester, year, grade)}
     \item \texttt{\textbf{teaches}(ID, course\_id, sec\_id, semester, year)}
     \item \texttt{\textbf{classroom}(building, room\_number, capacity)}
     \item \texttt{\textbf{time\_slot}(time\_slot\_id, day, start\_time, end\_time)}
