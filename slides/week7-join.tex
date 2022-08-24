@@ -518,7 +518,7 @@ WHERE student.id = takes.id;
 \end{frame}
 
 \begin{frame}
-    \frametitle{练习}
+    \frametitle{练习 (1)}
 使用 \texttt{join} 找到所有老师的ID，以及他们所讲授课程段的总数，并且确保未上课的老师显示课程段总数显示为 0。（提示：使用关系 \texttt{instructor} 和 \texttt{teaches}）
 
 \begin{itemize}
@@ -542,6 +542,23 @@ SELECT ID,
         WHERE T.id = I.id)
 FROM instructor I;
     \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{练习 (2)}
+
+    考虑大学数据库，找出 2017 年秋季 (Fall) 开设的每个课程段 (\texttt{section}) 的选课人数。（提示：包括选课人数等于 0 的课程段，连接关系 \texttt{takes} 和 \texttt{section}）
+
+\pause
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT course_id, sec_id, count(id)
+FROM section NATURAL LEFT JOIN takes
+WHERE semester = 'Fall'
+AND year = 2017
+GROUP BY course_id, sec_id;
+    \end{minted}
+
+
 \end{frame}
 
 \begin{frame}
