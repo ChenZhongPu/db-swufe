@@ -358,7 +358,7 @@ WHERE dept_name NOT LIKE '%sic%';
     \end{minted}
     \pause
     \noindent\rule{\textwidth}{1pt}
-\textbf{练习}：
+    {\large \faIcon{code}} \textbf{练习}：
 \begin{itemize}
     \item \texttt{'abc' LIKE 'abc'}    
     \item \texttt{'abc' LIKE 'a\%'} 
@@ -370,24 +370,30 @@ WHERE dept_name NOT LIKE '%sic%';
 \begin{frame}[fragile]
     \frametitle{思考}
 
-    \begin{table}
-        \caption*{The \texttt{users} table}
-        \begin{tabular}{ll}
-          \toprule
-          name & gender \\
-          \midrule
-          abc\%dd & m \\
-          abcdd & f \\
-          \bottomrule
-        \end{tabular}
-    \end{table}
-下面的 SQL 语句会输出几条结果？
+    \begin{columns}
+        \column{.4\textwidth}
+        \begin{table}
+            \caption*{The \texttt{users} table}
+            \begin{tabular}{ll}
+              \toprule
+              name & gender \\
+              \midrule
+              abc\%dd & m \\
+              abcdd & f \\
+              \bottomrule
+            \end{tabular}
+        \end{table}
+        \column{.6\textwidth}
+        {\large \faIcon[regular]{lightbulb}} 下面的 SQL 语句会输出几条结果？
 
-\begin{minted}[bgcolor=LightGray]{sql} 
+        \begin{minted}[bgcolor=LightGray]{sql} 
 SELECT *
 FROM users
 WHERE name like 'abc%d%';
-\end{minted}
+        \end{minted}
+    \end{columns}
+
+
 
 \end{frame}
 
@@ -423,7 +429,7 @@ print(s)
           \bottomrule
         \end{tabular}
     \end{table}
-\textbf{思考}：如何匹配以 \texttt{ab\textbackslash n} 的 \texttt{name}？
+{\large \faIcon[regular]{lightbulb}} \textbf{思考}：如何匹配以 \texttt{ab\textbackslash n} 的 \texttt{name}？
 \end{frame}
 
 \begin{frame}[fragile]
@@ -598,7 +604,7 @@ WHERE semester = 'Spring' AND year = 2018);
 
     考虑关系模式 marks(id, score)，并规定如果 score < 60 等级为 C，60 $\leq$ score < 80 等级为 B，score $\geq$ 80 等级为 A。
 
-    \textbf{问题}：基于 marks 关系，显示每个学生的成绩等级。
+    {\large \faIcon{question-circle}} \textbf{问题}：基于 marks 关系，显示每个学生的成绩等级。
     
 \[
 output = \begin{cases}

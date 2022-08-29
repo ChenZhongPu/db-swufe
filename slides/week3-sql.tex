@@ -211,7 +211,7 @@
     \bigskip
 
     \begin{quote}
-        DDL提供了\alert{定义关系模式}、\alert{删除关系}、\alert{修改关系模式}的命令。
+        DDL提供了\alert{定义/修改关系模式}和\alert{删除关系}命令。
     \end{quote}
 
 \end{frame}
@@ -246,7 +246,7 @@
     \item \texttt{real}, \texttt{double precision}：浮点数与双精度浮点数（与机器相关）
 \end{itemize}
 \pause
-\alert{思考}：\texttt{numeric(3, 1)}能表示哪个数？A. 3.14 B. 31.4 C. 314.0
+{\large \faIcon[regular]{lightbulb}} \texttt{numeric(3, 1)}能表示哪个数？A. 3.14 B. 31.4 C. 314.0
 \end{frame}
 
 \begin{frame}
@@ -432,7 +432,7 @@ DROP FROM r; -- This is to delete table r
 \end{frame}
 \begin{frame}[fragile]
     \frametitle{思考}
-表名应该使用单数（singular）还是复数（plural）？
+    {\large \faIcon[regular]{lightbulb}} 表名应该使用单数（singular）还是复数（plural）？
 
 \begin{minted}[bgcolor=LightGray]{sql}
 create table product
@@ -449,7 +449,7 @@ create table products
 \begin{frame}
     \frametitle{练习}
     
-    设计一个表，用来记录不同城市每日的天气数据，包括城市名、最高气温、最低气温、降雨概率、日期，其中气温记录整数即可。
+    {\large \faIcon{code}} 设计一个表，用来记录不同城市每日的天气数据，包括城市名、最高气温、最低气温、降雨概率、日期，其中气温记录整数即可。
 
     提示：日期的类型为 \texttt{date}。
 \end{frame}
@@ -579,7 +579,7 @@ where P;
 
 \begin{frame}[fragile]
     \frametitle{练习}
-    找出所有计算机学院的老师名字及其讲授课程的名字。
+    {\large \faIcon{code}} 找出所有计算机学院的老师名字及其讲授课程的名字。
 
 \begin{itemize}
     \item \texttt{instructor(ID, name, dept\_name, salary)}
@@ -662,7 +662,7 @@ from instructor
 order by salary desc, name asc;        
     \end{minted}     
 
-\pause \textbf{思考}：\alert{\texttt{order by A, B desc}} 是如何排序的？
+\pause {\large \faIcon[regular]{lightbulb}} \textbf{思考}：\alert{\texttt{order by A, B desc}} 是如何排序的？
 \end{frame}
 
 \begin{frame}

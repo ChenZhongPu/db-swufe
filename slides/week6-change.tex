@@ -188,7 +188,7 @@ DROP TABLE instructor;
 \end{frame}
 
 \begin{frame}
-    \frametitle{练习}
+    \frametitle{练习 {\large \faIcon{code}} }
     \texttt{instructor(ID, name, dept\_name, salary)}
     
     \begin{enumerate}
@@ -350,10 +350,10 @@ ALTER TABLE products ADD COLUMN description text;
     \begin{minted}[bgcolor=LightGray]{sql}
 ALTER TABLE products DROP COLUMN description; 
     \end{minted}    
-\textbf{练习}：为关系 \texttt{student} 新增属性 \texttt{nationality}，再删除它。
+    {\large \faIcon{code}}  \textbf{练习}：为关系 \texttt{student} 新增属性 \texttt{nationality}，再删除它。
 
 \pause
-\textbf{思考}：能否直接删除 \texttt{department} 的 \texttt{dept\_name}？
+{\large \faIcon[regular]{lightbulb}}  \textbf{思考}：能否直接删除 \texttt{department} 的 \texttt{dept\_name}？
 
 \pause
 \begin{tikzpicture}
@@ -439,6 +439,7 @@ ALTER COLUMN price DROP DEFAULT;
 
 \begin{frame}[fragile]
     \frametitle{3.2 unique}
+
 \begin{quote}
     \textbf{完整性约束}保证用户对数据库所做的修改不会破坏数据的一致性。
 \end{quote}
@@ -475,13 +476,13 @@ CREATE TABLE products (
 );
     \end{minted} 
 
-\textbf{练习}：有 \texttt{unique} 约束的值能否为 \texttt{null}？
+    {\large \faIcon{code}}  \textbf{练习}：有 \texttt{unique} 约束的值能否为 \texttt{null}？
 
 \end{frame}
 
 {\setbeamercolor{palette primary}{fg=black, bg=yellow}
 \begin{frame}[standout]
-  \texttt{primary key} 相当于 \texttt{not null} 加上 \texttt{unique}。
+  \texttt{primary key} 大致相当于 \texttt{not null} 加上 \texttt{unique}。
 \end{frame}
 }
 
@@ -523,7 +524,7 @@ CREATE TABLE products (
     price numeric CHECK (price > 0)
 );
     \end{minted}
-\textbf{练习}：\texttt{price} 能否为空？
+    {\large \faIcon{code}}  \textbf{练习}：\texttt{price} 能否为空？
 
 \pause
 

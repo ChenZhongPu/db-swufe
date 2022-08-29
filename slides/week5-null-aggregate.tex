@@ -175,7 +175,7 @@ WHERE ID = '8888';
 
 \begin{frame}[fragile]
     \frametitle{1.2 空值的比较}
-    考虑 \texttt{1 > NULL}，它的结果是什么？
+    {\large \faIcon{code}} 考虑 \texttt{1 > NULL}，它的结果是什么？
     \begin{minted}[bgcolor=LightGray]{sql}
 SELECT 1 > NULL;
     \end{minted} 
@@ -206,7 +206,7 @@ CREATE TABLE test1 (a boolean, b text);
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习}
+    \frametitle{练习 {\large \faIcon{code}} }
     Zhongpu 是否会在下面 SQL 的查询结果？
 
     \begin{minted}[bgcolor=LightGray]{sql}
@@ -226,7 +226,8 @@ WHERE salary >= 80000;
 \end{frame}
 
 \begin{frame}
-    \textbf{思考}：当 \texttt{WHERE} 子句是 \texttt{NOT (salary < 80000)}，Zhongpu 是否会出现？
+
+    {\large \faIcon[regular]{lightbulb}} \textbf{思考}：当 \texttt{WHERE} 子句是 \texttt{NOT (salary < 80000)}，Zhongpu 是否会出现？
 \pause    
 \begin{itemize}
     \item \alert{AND}
@@ -334,7 +335,7 @@ FROM test1;
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习}
+    \frametitle{练习 {\large \faIcon{code}} }
 使用 \texttt{case} 表达式重写下面的 SQL 语句：
 
 \begin{minted}[bgcolor=LightGray]{sql}
@@ -418,6 +419,20 @@ WHERE semester = 'Spring' AND year = 2018;
     text width=20em,anchor=south west,rounded corners]
     {\texttt{count (distinct *)} 是不合法的。};
 \end{tikzpicture}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{聚集：不能直接出现在 where}
+
+    \begin{minted}[baselinestretch=1,bgcolor=LightGray]{sql}
+-- 下面的查询是不合法的！
+SELECT ID
+FROM instructor
+WHERE salary = min(salary);
+    \end{minted}  
+
+WHERE 子句中的谓词是在聚集之前起作用（it controls which rows go into the aggregate computation）。
 
 \end{frame}
 
@@ -524,7 +539,7 @@ GROUP BY dept_name;
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习 (1)}
+    \frametitle{练习 (1) {\large \faIcon{code}} }
 使用理论知识回答即可。
 \begin{columns}
     \column{.35\textwidth}
@@ -554,7 +569,7 @@ GROUP BY x;
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习 (2)}
+    \frametitle{练习 (2) {\large \faIcon{code}} }
 下面的查询是否合法？
 
 \begin{minted}[baselinestretch=1,bgcolor=LightGray]{sql}
@@ -608,7 +623,7 @@ HAVING avg(salary) > 42000;
 
     \begin{columns}
         \column{0.4\textwidth}
-        如何理解其执行次序？
+        {\large \faIcon[regular]{lightbulb}} 如何理解其执行次序？
         \begin{minted}[bgcolor=LightGray]{sql}
 SELECT some_attr
 FROM some_rel
@@ -643,7 +658,7 @@ HAVING count(student.id) >= 2;
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习 (1)}
+    \frametitle{练习 (1) {\large \faIcon{code}} }
 使用理论知识回答即可。
     
 \begin{columns}
@@ -674,7 +689,7 @@ GROUP BY x HAVING x < 'c';
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习 (2)}
+    \frametitle{练习 (2) {\large \faIcon{code}} }
 
 下面的 SQL 查询是否合法？
 
@@ -689,6 +704,25 @@ GROUP BY x HAVING y > 3;
     text width=26em,anchor=south west,rounded corners]
     {重要提醒：出现在 \texttt{select} 和 \texttt{having} 子句中但没有被聚集的属性只能是出现在 \texttt{group by} 子句中的那些属性！};
 \end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{2.4 查询性能}
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1.1]{sql} 
+-- 不推荐。having 子句一般使用聚集函数！
+SELECT x, sum(y) FROM test1 
+GROUP BY 
+x HAVING x > 3;
+
+-- 性能更好
+SELECT x, sum(y) FROM test1 
+GROUP BY x 
+WHERE x > 3;
+    \end{minted}
+
+    
 
 \end{frame}
 
@@ -824,7 +858,7 @@ WHERE semester = 'Fall' AND year = 2017
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习}
+    \frametitle{练习 {\large \faIcon{code}} }
 
     \begin{columns}
         \column{.3\textwidth}
@@ -936,7 +970,7 @@ WHERE salary > ALL(SELECT salary
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习}
+    \frametitle{练习 {\large \faIcon{code}} }
     \begin{minted}[baselinestretch=1,bgcolor=LightGray]{sql}
 SELECT dept_name FROM instructor
 GROUP BY dept_name
@@ -1157,7 +1191,7 @@ HAVING sum(salary) > (SELECT avg(value)
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{练习}
+    \frametitle{练习 {\large \faIcon{code}} }
     \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 CASE
     WHEN condition1 THEN result1

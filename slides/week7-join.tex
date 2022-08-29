@@ -190,13 +190,13 @@ FROM student NATURAL JOIN takes;
     \end{minted}
 
 \pause
-\textbf{思考}：没有选课的学生会出现在结果吗？（提示：\texttt{mydb} 中 Snow 没有选课）
+{\large \faIcon[regular]{lightbulb}} \textbf{思考}：没有选课的学生会出现在结果吗？（提示：\texttt{mydb} 中 Snow 没有选课）
 \end{frame}
 
 \begin{frame}[fragile]
     \frametitle{练习}
 
-下面两条 SQL 语句的结果是否相同？
+{\large \faIcon{code}} 下面两条 SQL 语句的结果是否相同？
     
 \begin{minted}[bgcolor=LightGray, baselinestretch=.9]{sql}
 -- 笛卡尔积可以理解成 cross join
@@ -310,7 +310,7 @@ FROM (student NATURAL JOIN takes)
     \draw[ultra thick, draw=blue] (6, -0.3) -- (on);
 \end{tikzpicture}
 
-\textbf{思考}：使用 \texttt{on} 指定条件的连接是否会去除重复属性？
+{\large \faIcon[regular]{lightbulb}}  \textbf{思考}：使用 \texttt{on} 指定条件的连接是否会去除重复属性？
 
 \end{frame}
 
@@ -336,7 +336,7 @@ ON student.id = takes.id;
 \begin{frame}[fragile]
     \frametitle{练习}
 
-将下面的查询使用 \texttt{join} 和 \texttt{on} 改写。
+    {\large \faIcon{code}} 将下面的查询使用 \texttt{join} 和 \texttt{on} 改写。
 
 \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT DISTINCT T.name
@@ -366,7 +366,7 @@ ON T.salary > S.salary
 WHERE S.dept_name = 'History';   
     \end{minted}
 
-\textbf{思考}：\texttt{where} 的作用与 \texttt{on} 看起来差不多，为什么 SQL 会引入 \texttt{on} 子句？
+    {\large \faIcon[regular]{lightbulb}}  \textbf{思考}：\texttt{where} 的作用与 \texttt{on} 看起来差不多，为什么 SQL 会引入 \texttt{on} 子句？
 
 \pause
 \begin{tikzpicture}
@@ -450,13 +450,13 @@ FROM student NATURAL INNER JOIN takes;
 \begin{frame}[fragile]
     \frametitle{练习}
 \begin{itemize}
-    \item<1-> 如果要让尚未选课的学生出现在结果中，应该填入 \alert{left} 还是 \alert{right}？
+    \item<1-> {\large \faIcon{code}} 如果要让尚未选课的学生出现在结果中，应该填入 \alert{left} 还是 \alert{right}？
     \begin{verbatim}
 SELECT * 
 FROM student () JOIN takes 
 ON student.id = takes.id;
     \end{verbatim}
-    \item<2-> 用自然连接 (\texttt{natural join}) 改写上面的查询。
+    \item<2-> {\large \faIcon{code}} 用自然连接 (\texttt{natural join}) 改写上面的查询。
 \end{itemize}
 
 \end{frame}
@@ -513,13 +513,13 @@ WHERE student.id = takes.id;
 \begin{frame}
     \frametitle{思考}
 
-    部分数据库系统（如 MySQL）没有实现 \texttt{full outer join}，只实现了 \texttt{left} 和 \texttt{right outer join}。那么如何在这样的数据库系统中写出 \texttt{full outer join}?
+    {\large \faIcon[regular]{lightbulb}}  部分数据库系统（如 MySQL）没有实现 \texttt{full outer join}，只实现了 \texttt{left} 和 \texttt{right outer join}。那么如何在这样的数据库系统中写出 \texttt{full outer join}?
 
 \end{frame}
 
 \begin{frame}
     \frametitle{练习 (1)}
-使用 \texttt{join} 找到所有老师的ID，以及他们所讲授课程段的总数，并且确保未上课的老师显示课程段总数显示为 0。（提示：使用关系 \texttt{instructor} 和 \texttt{teaches}）
+    {\large \faIcon{code}}  使用 \texttt{join} 找到所有老师的ID，以及他们所讲授课程段的总数，并且确保未上课的老师显示课程段总数显示为 0。（提示：使用关系 \texttt{instructor} 和 \texttt{teaches}）
 
 \begin{itemize}
     \item \texttt{\textbf{teaches}(ID, course\_id, sec\_id, semester, year)}
@@ -546,7 +546,7 @@ FROM instructor I;
 
 \begin{frame}[fragile]
     \frametitle{练习 (2)}
-
+    {\large \faIcon{code}} 
     考虑大学数据库，找出 2017 年秋季 (Fall) 开设的每个课程段 (\texttt{section}) 的选课人数。（提示：包括选课人数等于 0 的课程段，连接关系 \texttt{takes} 和 \texttt{section}）
 
 \pause
@@ -591,7 +591,7 @@ CREATE TABLE course
 foreign key (dept_name) references department 
 \end{minted}
 
-如果某学院（\texttt{department}）被撤销，那么该学院开设的课程怎么办？
+{\large \faIcon[regular]{lightbulb}}  如果某学院（\texttt{department}）被撤销，那么该学院开设的课程怎么办？
 \pause
 \begin{itemize}
     \item 默认是拒绝操作
@@ -620,7 +620,7 @@ CREATE TABLE course
 
 \begin{frame}
     \section{\textcolor{darkmidnightblue}{3. 视图 (view)}} 
-    虚拟的表
+    虚拟的表（\textbf{虚关系}）
 \end{frame}
 
 \begin{frame}[fragile]
@@ -675,11 +675,11 @@ CREATE VIEW faculty AS
 \begin{itemize}
     \item<1-> 视图（view）并不预先计算并存储，而是在使用虚关系的时候才通过执行查询被重新计算处理。
     \item<1-> 从 SQL 查询语法上，「视图」和普通的「关系」没有区别。
-    \item<2-> 部分数据库允许存储视图，并确保一旦关系发生改变，对应的视图也能更新。这样的视图叫物化视图 (materialized view)。
+    \item<2-> 部分数据库允许存储视图，并确保一旦关系发生改变，对应的视图也能更新。这样的视图叫\alert{物化视图} (materialized view)。
 \end{itemize}
 
 \pause
-\textbf{练习}：利用 faculty 视图，查询 ID 为 10101 的教师信息。
+{\large \faIcon{code}}  \textbf{练习}：利用 faculty 视图，查询 ID 为 10101 的教师信息。
 
 \end{frame}
 
