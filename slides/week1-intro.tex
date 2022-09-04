@@ -163,7 +163,7 @@
     \begin{block}{课本}
         A database-management system (DBMS) is a collection of interrelated data and a set of programs to access those data.
     \end{block}
-    并且，数据库系统有两大基本需求：\alert{convenient} 和 \alert{efficient}。
+    并且，数据库系统有两大基本目标：\alert{convenient} 和 \alert{efficient}。
 \end{frame}
 
 \begin{frame}
@@ -263,29 +263,6 @@
 \begin{frame}
     \section{\textcolor{darkmidnightblue}{3. 数据库系统的作用}}
     如果没有数据库系统，那么人们应该如何管理数据？
-\end{frame}
-
-\begin{frame}[fragile]
-\begin{quote}
-    \begin{columns}
-        \column{0.5\textwidth} 
-        记得早先少年时，\\
-        大家诚诚恳恳，\\
-        说一句，是一句。\\
-        \bigskip
-        清早上火车站，\\
-        长街黑暗无行人，\\
-        卖豆浆的小店冒着热气。\\
-        \column{0.5\textwidth}
-        从前的日色变得慢，\\
-\alert{车，马，邮件都慢}，\\
-一生只够爱一个人。\\
-\bigskip
-从前的锁也好看，\\
-钥匙精美有样子。\\
-你锁了，人家就懂了。\\
-    \end{columns}
-\end{quote}
 \end{frame}
 
 \begin{frame}
@@ -498,6 +475,22 @@ VALUES ('Bob', 'Computer Science', 1000);
     \begin{center}
         {\Huge \faIcon{file} \faIcon{arrow-right} \faIcon{database}}
     \end{center}
+
+    \pause
+\faIcon{lightbulb} 要牢记 trade-off 的理念：文件处理系统（file-processing system）和数据库系统（DBMS）并不是完全对立的；在合适的场景选用合适的系统。
+\end{frame}
+
+\begin{frame}
+    \frametitle{何时使用数据库系统}
+
+一般来说，DBMS 管理的数据具备以下特征：
+
+\begin{enumerate}
+    \item \textbf{非常有价值}（highly valuable）
+    \item \textbf{相对很大}（relatively large）
+    \item \textbf{（同时）被多个应用和用户访问}（accessed by multiple users and applications）
+\end{enumerate}
+    
 
 \end{frame}
 
@@ -772,7 +765,7 @@ WHERE instructor.dept_name = 'History';
 
 \begin{frame}
     \begin{center}
-        \includegraphics[height=.95\paperheight]{DBMS}
+        \includegraphics[height=.99\paperheight]{image/system}
     \end{center}
 
     
@@ -860,7 +853,7 @@ PostgreSQL:
 
 \begin{itemize}
     \item \faIcon{windows} Windows：从 EDB 下载\href{https://www.enterprisedb.com/downloads/postgres-postgresql-downloads}{安装包}或\href{https://www.enterprisedb.com/download-postgresql-binaries}{二进制包}。
-    \item \faIcon{apple} MacOS：从\href{https://postgres.app/}{Postgres.app}下载。
+    \item \faIcon{apple} MacOS：从 \href{https://postgres.app/}{Postgres.app} 下载。
 \end{itemize}   
 
 \end{frame}

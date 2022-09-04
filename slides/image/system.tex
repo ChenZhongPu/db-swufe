@@ -1,0 +1,115 @@
+\documentclass[tikz, margin=5mm]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{xeCJK}
+\usetikzlibrary{arrows, positioning}
+\usetikzlibrary{calc,shapes.multipart,chains}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes,snakes}
+\usetikzlibrary {arrows.meta}
+\usetikzlibrary{fit}
+\usepackage{xcolor}
+\definecolor{mycolor}{RGB}{84,104,255}
+\tikzset{fit margins/.style={/tikz/afit/.cd,#1,
+    /tikz/.cd,
+    inner xsep=\pgfkeysvalueof{/tikz/afit/left}+\pgfkeysvalueof{/tikz/afit/right},
+    inner ysep=\pgfkeysvalueof{/tikz/afit/top}+\pgfkeysvalueof{/tikz/afit/bottom},
+    xshift=-\pgfkeysvalueof{/tikz/afit/left}+\pgfkeysvalueof{/tikz/afit/right},
+    yshift=-\pgfkeysvalueof{/tikz/afit/bottom}+\pgfkeysvalueof{/tikz/afit/top}},
+    afit/.cd,left/.initial=2pt,right/.initial=2pt,bottom/.initial=2pt,top/.initial=2pt}
+\begin{document}
+\begin{tikzpicture}[mynode2/.style={fill=mycolor!10, align=center, minimum width=30mm, draw, ellipse}, mynode/.style={fill=mycolor!30, draw, rounded corners, minimum width=30mm, minimum height=10mm, align=center, font=\large},]
+  
+    \matrix [column sep=1cm, anchor=center] (users)
+    {
+      \node[mynode](nuser) {naive \\ users};  & 
+      \node[mynode](apppro) {applications \\programmers}; &
+      \node[mynode](susers) {sophisticated \\ users}; &
+      \node[mynode](dba) {DB \\ administrators}; \\
+    };
+
+
+    \node[mynode2, below=of nuser](appinterface){application \\ interfaces};
+
+    \draw[thick] (nuser) -- node[right]{use} (appinterface);
+
+    \node[mynode2, below=of apppro](apps) {application \\ programs};
+    \draw[thick] (apppro) -- node[right]{write} (apps);
+
+    \node[mynode2, below=of susers](querytool) {query \\tools};
+    \draw[thick] (susers) -- node[right]{use} (querytool);
+
+    \node[mynode2, below=of dba](dbatool) {administration \\tools};
+    \draw[thick] (dba) -- node[right]{use} (dbatool);
+
+    \node[mynode, below=of appinterface, yshift=-3cm](code){application program \\ object code};
+
+    \node[mynode, below=of apps, yshift=-1cm](linker) {compiler and \\linker};
+
+    \draw[<-, thick] (code) -- (linker);
+
+    \node[mynode, below=of querytool, yshift=-1.2cm](dml){DML queries};
+    \draw[->, thick] (linker) -- (dml);
+    \node[mynode, below=of dbatool, yshift=-1cm](ddl){DDL\\ interpreter};
+    
+    \draw[thick] (querytool) -- (dml);
+    \draw[thick] (dbatool) -- (dml);
+    \draw[thick] (dbatool) -- (ddl);
+    \draw[->, thick] (code) -- (dml);
+    \draw[->, thick] (apps) -- (linker);
+    \draw[thick] (appinterface) -- (code);
+
+    \node[mynode, below=of dml] (dmlcompiler){DML compiler \\ and organizer};
+
+    \draw[->, thick] (dml) -- (dmlcompiler);
+    
+    \node[mynode, below right=of code](engine) {query evaluation\\engine};
+
+    \draw[thick, ->](code)|-(engine);
+    \draw[thick, ->] (dmlcompiler) |- (engine);
+
+    \node[below=of ddl, red]{\large{query processor}};
+
+    \node[fit=(code)(linker)(dml)(ddl)(engine)(dmlcompiler), dashed, draw](queryprocessor) {};
+
+    \node[mynode, below=of code, yshift=-3cm, xshift=-.35cm](buffer) {buffer \\ manager};
+
+    \node[mynode, right=of buffer, xshift=-.5cm](file) {file \\manager};
+
+    \node[mynode, right=of file,xshift=1cm](integrity){authorization \\and integrity \\ manager};
+    \node[mynode, right=of integrity, xshift=-.5cm](transaction){transaction \\manager};
+
+    \node[fit=(buffer)(file)(integrity)(transaction), draw, dashed, fit margins={left=3pt,right=7pt,bottom=20pt,top=8pt}]{};
+
+    \draw[thick] (engine) -- (buffer);
+    \draw[thick] (engine) -- (file);
+    \draw[thick] (engine) -- (integrity);
+    \draw[thick] (engine) -- (transaction);
+    
+    \node[red, below=of transaction]{\large{storage manager}};
+
+
+
+    \node[draw, below=of buffer, yshift=-6cm,font=\Large](data){data};
+
+    \node[draw, above right=of data, font=\Large](index){index};
+
+    \node[draw, right=of index, font=\Large](dir){data directory};
+
+    \node[draw, right=of dir, font=\Large](sta){statistical data};
+
+    \draw[thick] (data) -- (buffer);
+    \draw[thick] (data) -- (file);
+    \draw[thick] (index) -- (buffer);
+    \draw[thick] (index) -- (buffer);
+    \draw[thick] (index) -- (file);
+
+    \draw[thick] (integrity) -- (dir);
+    \draw[thick] (engine) -- (dir);
+    \draw[thick] (engine) to[out=-80,in=140] (sta);
+
+        \node [fit=(data)(index)(dir)(sta),cylinder, shape border rotate=90, draw, aspect=.2] {};
+
+    \node[below=of sta, red]{\large{disk storage}};
+
+\end{tikzpicture}
+\end{document}
