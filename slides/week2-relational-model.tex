@@ -119,6 +119,18 @@
         \end{quote}
     \end{frame}
 }
+
+\begin{frame}
+    \frametitle{Relation}
+
+\begin{exampleblock}{Relation}
+    Given sets $X$ and $Y$, the Cartesian product $X \times Y$ is defined as $\{(x, y) | x \in X \text{ and } y \in Y\}$, and its elements are called ordered pairs.
+
+    A \alert{binary relation} $R$ over sets $X$ and $Y$ is a subset of $X \times Y$.
+\end{exampleblock}
+    
+
+\end{frame}
 \begin{frame}
     \frametitle{1.1 关系数据库的结构}
 
@@ -148,15 +160,15 @@
         \caption*{The \emph{course} table}
     \end{figure}
 \begin{columns}
-    \column{0.475\textwidth} 
+    \column{0.4\textwidth} 
     \begin{figure}
         \includegraphics[height=.35\paperheight]{table/prereq}
         \caption*{The \emph{prereq} table} 
     \end{figure}
-    \column{0.475\textwidth}
+    \column{0.575\textwidth}
     \begin{tikzpicture}
         \node[fill=yellow,blur shadow={shadow xshift=-0.5ex},
-        text width=12em,anchor=south west,rounded corners]
+        text width=14em,anchor=south west,rounded corners]
         {Two courses are \textbf{related}.};
     \end{tikzpicture} 
 \end{columns}
@@ -186,7 +198,7 @@
     \frametitle{1.2 关系模式}
 \begin{itemize}
     \item 数据库模式 (database schema)：数据库的逻辑设计
-    \item 数据库实例 (database instance) ：给定时刻数据库中数据的快照
+    \item 数据库实例 (database instance)：给定时刻数据库中数据的快照
 \end{itemize}
     类似的，也有关系模式 (relation schema)和关系实例 (relation instance)。
 
@@ -437,16 +449,16 @@
         \column{.475\textwidth} 
         \alert{选择} \texttt{dept\_name} 为 \texttt{Physics}的所有老师。
         \includegraphics[width=\textwidth]{table/select-instructor}
-        \pause
         
         \begin{tikzpicture}
             \node[fill=yellow,blur shadow={shadow xshift=-0.5ex},
             text width=10em,anchor=south west,rounded corners]
             {小写希腊字母sigma};
         \end{tikzpicture} 
-        \large{\[\sigma_{dept\_name =  ``Physics"}(instructor)\]}
 
     \end{columns}
+    \pause
+\large{\[\sigma_{dept\_name =  ``Physics"}(instructor)\]}
 
 \end{frame}
 
@@ -463,9 +475,7 @@
 \end{frame}
 
 \begin{frame}
-谓词（predicate）的比较操作可以使用符号：$>$, $<$, $=$, $\geq$, $\leq$, $\neq$。
-
-多个谓词可以通过\alert{逻辑联结词} (logical connectives)结合：
+谓词（predicate）的比较操作可以使用符号：$>$, $<$, $=$, $\geq$, $\leq$, $\neq$。此外，多个谓词可以通过\alert{逻辑联结词} (logical connectives)结合：
 
 \begin{itemize}
     \item and: $\land$
@@ -481,7 +491,7 @@
 
 \begin{frame}
     \frametitle{投影 (project)}
-    返回所有老师的 \texttt{ID}、\texttt{name} 和 \texttt{salary}。
+    返回所有老师的 \texttt{name}、\texttt{dept\_name} 和 \texttt{salary}。
     \begin{columns}
         \column{.475\textwidth}
         \includegraphics[width=\textwidth, trim={0 4.4cm 0 0},clip]{table/instructor}
@@ -493,8 +503,8 @@
             text width=8em,anchor=south west,rounded corners]
             {大写希腊字母Pi};
         \end{tikzpicture} 
-        \large{\[\Pi_{ID, name, salary}(instructor)\]}
     \end{columns}
+    \large{\[\Pi_{ID, dept\_name, salary}(instructor)\]}
 \end{frame}
 
 \begin{frame}
@@ -503,8 +513,8 @@
     \end{center}
 
 \begin{itemize}
-    \item select ($\sigma$)：「水平地」截取关系，影响「行」
-    \item project ($\Pi$)：「垂直地截取」关系，影响「列」
+    \item select ($\sigma$)：\alert{水平地}截取关系，影响「行」
+    \item project ($\Pi$)：\alert{垂直地}截取关系，影响「列」
 \end{itemize}
 \pause
 并且，通用的投影操作允许在属性上进行简单的运算：\large{\(\Pi_{ID, name, salary/12}(instructor)\)}
@@ -567,7 +577,7 @@
     \texttt{join}是笛卡尔积 (Cartesian product) 和选择 (selection) 的结合：
     {\large \[instructor \Join_{instructor.ID=teaches.ID} teaches\]}
     \begin{figure}
-        \includegraphics[width=.8\textwidth]{table/join2}
+        \includegraphics[width=.6\textwidth]{table/join2}
     \end{figure}
 
 \begin{exampleblock}{Join}
@@ -628,7 +638,7 @@
 \end{frame}
 
 \begin{frame}
-    \texttt{\textbf{section}(course\_id, sec\_id, semester, year, building, root\_number, time\_slot\_id)}
+    \texttt{\textbf{section}(course\_id, sec\_id, semester, year, building, room\_number, time\_slot\_id)}
     
         找出所有同时在 2017 年 Fall 学期和 2018 年 Spring 学期的课程：
         
