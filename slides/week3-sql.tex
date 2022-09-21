@@ -92,20 +92,29 @@
             \item 关系代数
         \end{itemize}
         \column{.64\textwidth}<2->
-        \begin{tikzpicture}[slot/.style={draw, minimum size=1cm,rectangle, rounded corners=0.1cm}]
-           \matrix[nodes=draw, column sep=.5cm](first) {
-            \node[slot, fill=blue!30]{DML}; & \node[slot, fill=blue!30]{DDL}; &\node[slot]{视图 (view)};\\
-           };
-           \matrix[nodes=draw, column sep=.5cm, below=of first, yshift=1cm](second) {
-            \node[slot]{完整性 (integrity)}; & \node[slot]{事务 (transaction)}; \\
-           }; 
-           \node[slot, below=of second, yshift=.8cm](third){授权(authorization)};
-           \node[slot, below=of third, text width=6cm, yshift=.6cm](fourth){嵌入式、动态 SQL
-           (embedded, dynamic SQL)
-           };
-        \end{tikzpicture}
+        Relation is essentially a mathematical term for table. Each table is a named collection of rows. Each row of a given table has the same set of named columns, and each column is of a specific data type. Whereas columns have a fixed order in each row, it is important to remember that DB does not guarantee the order of the rows within the table in any way.
     \end{columns}
 
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{数据库查询语言：SQL}
+    \begin{center}
+        \begin{tikzpicture}[slot/.style={draw, minimum size=1.2cm,rectangle, rounded corners=0.1cm}]
+            \matrix[nodes=draw, column sep=.5cm](first) {
+             \node[slot, fill=blue!30]{DML}; & \node[slot, fill=blue!30]{DDL}; &\node[slot]{视图 (view)};\\
+            };
+            \matrix[nodes=draw, column sep=.5cm, below=of first, yshift=1cm](second) {
+             \node[slot]{完整性 (integrity)}; & \node[slot]{事务 (transaction)}; \\
+            }; 
+            \node[slot, below=of second, yshift=.8cm](third){授权(authorization)};
+            \node[slot, below=of third, text width=10cm, yshift=.6cm](fourth){嵌入式、动态 SQL
+            (embedded, dynamic SQL)
+            };
+         \end{tikzpicture}        
+    \end{center}
+
+    
 \end{frame}
 
 {
@@ -343,11 +352,17 @@ create table r
 
 \begin{frame}
     \frametitle{码与约束}
-\begin{quote}
+\begin{block}{码}
     码（key）：用来区分给定「关系」中的不同「元组」。
-\end{quote}
-码的指定代表了被建模的事物在现实世界中的\alert{约束}（包括\texttt{primary key}、\texttt{foreign key}和
-\texttt{not null}等）。
+\end{block}
+码的指定也属于被建模的事物在现实世界中的\alert{约束}，比如：
+
+\begin{itemize}
+    \item \texttt{primary key}
+    \item \texttt{foreign key}
+    \item \texttt{not null}
+    \item ...
+\end{itemize}
 
 \end{frame}
 
@@ -579,7 +594,7 @@ where P;
 
 \begin{frame}[fragile]
     \frametitle{练习}
-    {\large \faIcon{code}} 找出所有计算机学院的老师名字及其讲授课程的名字。
+    {\large \faIcon{code}} 找出所有计算机学院的老师名字及其讲授课程的课程号。
 
 \begin{itemize}
     \item \texttt{instructor(ID, name, dept\_name, salary)}
@@ -625,7 +640,7 @@ select name as teacher from instructor;
     \begin{minted}[bgcolor=LightGray]{sql} 
 select name, course_id
 from instructor, teaches
-where instructor.ID= teaches.ID;   
+where instructor.ID = teaches.ID;   
 
 select name, course_id
 from instructor as T, teaches as S
