@@ -1,5 +1,7 @@
 /*.pdf
 _minted-*/
+exercise.tex
+exercise/
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
