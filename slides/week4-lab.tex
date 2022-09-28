@@ -250,7 +250,7 @@ WHERE dept_name = 'Physics';
 
 SELECT name
 FROM instructor
-WHERE salary BETWEEN 90000 and 100000;
+WHERE salary BETWEEN 90000 AND 100000;
 \end{minted}      
 
 \end{frame}
@@ -367,8 +367,26 @@ WHERE dept_name NOT LIKE '%sic%';
 \end{itemize}
 \end{frame}
 
+
 \begin{frame}[fragile]
-    \frametitle{思考}
+    \frametitle{思考 (1)}
+
+运行下面的语句，你有什么结论？关系 \texttt{instructor} 有个教师名字是 \texttt{Wu}：
+
+\begin{minted}[bgcolor=LightGray]{sql} 
+SELECT *
+FROM instructor
+WHERE name LIKE 'Wu%';
+
+SELECT *
+FROM instructor
+WHERE name LIKE 'Wu_';
+\end{minted}
+    
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{思考 (2)}
 
     \begin{columns}
         \column{.4\textwidth}
@@ -389,7 +407,7 @@ WHERE dept_name NOT LIKE '%sic%';
         \begin{minted}[bgcolor=LightGray]{sql} 
 SELECT *
 FROM users
-WHERE name like 'abc%d%';
+WHERE name LIKE 'abc%d%';
         \end{minted}
     \end{columns}
 
@@ -402,7 +420,7 @@ WHERE name like 'abc%d%';
 如果要匹配\texttt{\%}本身，需要使用\alert{\textbackslash\%}。
 \begin{minted}[bgcolor=LightGray]{sql} 
 SELECT * FROM users
-WHERE name like 'abc\%d%';
+WHERE name LIKE 'abc\%d%';
 \end{minted}
 \begin{quote}
     当\alert{转义字符} (escape character) 放在字符序列时，它将对它后续的几个字符进行替代并解释。
