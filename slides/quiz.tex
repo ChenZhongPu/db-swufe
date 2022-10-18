@@ -43,14 +43,31 @@
 \end{enumerate}
 
 \section{实验}
-假设性别有三种情况：男（M）、女（F）和未知（null），那么在分组的时候，多个null都在一组，还是各自成组？请用实验验证你的猜想。
+\begin{enumerate}
+    \item 假设性别有三种情况：男（M）、女（F）和未知（null），那么在分组的时候，多个null都在一组，还是各自成组？请用实验验证你的猜想。
 
-\begin{lstlisting}[language=SQL]
-    CREATE TABLE users(
-        name varchar(50) PRIMARY KEY,
-        pswd varchar(50) NOT NULL,
-        gender char(1),
-        salary decimal(8, 2)
-    );
-\end{lstlisting}
+    \begin{lstlisting}[language=SQL]
+        CREATE TABLE users(
+            name varchar(50) PRIMARY KEY,
+            pswd varchar(50) NOT NULL,
+            gender char(1),
+            salary decimal(8, 2)
+        );
+    \end{lstlisting}
+    \item 下面的查询是否合法？请用实验验证你的猜想。
+    \begin{lstlisting}[language=SQL]
+        SELECT AVG(salary), name FROM users;
+    \end{lstlisting}  
+    \item 下面的查询有什么区别？ 请用实验验证你的猜想。
+    \begin{lstlisting}[language=SQL]
+        SELECT COUNT(*) FROM users;
+        
+        SELECT COUNT(gender) FROM users;
+
+        SELECT COUNT(1) FROM users;
+
+        SELECT COUNT(1 + 1) FROM users;
+    \end{lstlisting} 
+\end{enumerate}
+
 \end{document}
