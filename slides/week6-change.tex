@@ -124,7 +124,7 @@ SELECT count(*) FROM account;
 
 \begin{frame}
     \frametitle{小测试 (2)}
-    列出每个系老师的平均工资  \texttt{instructor(ID, name, dept\_name, salary)}：
+    考虑关系\texttt{instructor(ID, name, dept\_name, salary)}，列出每个系老师的平均工资：
 
 \begin{enumerate}
     \item 使用 \texttt{group by} 子句
@@ -311,6 +311,20 @@ SET salary = CASE
 \begin{frame}
     \frametitle{练习}
 \href{https://www.w3school.com.cn/quiz/quiz.asp?quiz=sql}{W3School-SQL}
+\end{frame}
+
+\begin{frame}
+    \frametitle{数据库的备份（自学）}
+PostgreSQL还提供了\texttt{pg\_dump}和\texttt{pg\_dumpall}等命令，用于数据库的备份与迁移。
+
+MySQL中也提供类似的命令，如{mysqldump}等。
+
+\begin{tikzpicture}
+    \node[fill=yellow,blur shadow={shadow xshift=-0.5ex},
+    text width=20em,anchor=south west,rounded corners]
+    {这些命令是可执行程序，不是SQL命令。};
+\end{tikzpicture}  
+
 \end{frame}
 
 \begin{frame}
