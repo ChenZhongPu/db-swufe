@@ -713,8 +713,8 @@ GROUP BY x HAVING y > 3;
     \begin{minted}[bgcolor=LightGray, baselinestretch=1.1]{sql} 
 -- 不推荐。having 子句一般使用聚集函数！
 SELECT x, sum(y) FROM test1 
-GROUP BY 
-x HAVING x > 3;
+GROUP BY x 
+HAVING x > 3;
 
 -- 性能更好
 SELECT x, sum(y) FROM test1 

@@ -1,0 +1,295 @@
+\documentclass[aspectratio=169, 14pt]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{xeCJK}
+\usepackage{graphicx}
+\usepackage{transparent}
+\usepackage[ruled, lined, linesnumbered, commentsnumbered]{algorithm2e}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usetikzlibrary{matrix,backgrounds}
+\usetikzlibrary{arrows}
+\usetikzlibrary {arrows.meta}
+\usetikzlibrary{calc,shadows.blur,fit,positioning}
+\usepackage{minted}
+\usepackage{fontawesome5}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    }
+\urlstyle{same}
+\usetheme{metropolis}
+\metroset{block=fill}
+\usecolortheme{default}
+\definecolor{darkmidnightblue}{rgb}{0.0, 0.2, 0.4}
+\definecolor{LightGray}{gray}{0.9}
+
+
+%------------------------------------------------------------
+%This block of code defines the information to appear in the
+%Title page
+\title[Database Principles and Applications] %optional
+{数据库原理与应用}
+
+\subtitle{高级SQL（2）}
+
+\author[CHEN Zhongpu] % (optional)
+{CHEN Zhongpu}
+
+\institute[] % (optional)
+{
+  School of Computing and Artificial Intelligence \\
+  \href{mailto:zpchen@swufe.edu.cn}{zpchen@swufe.edu.cn}
+}
+
+\date[] % (optional)
+{SWUFE, Fall 2022}
+
+%End of title page configuration block
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%The next block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+
+% \AtBeginSection[]
+% {
+%   \begin{frame}
+%     \frametitle{Table of Contents}
+%     \tableofcontents[currentsection]
+%   \end{frame}
+% }
+%------------------------------------------------------------
+
+
+\begin{document}
+
+%The next statement creates the title page.
+\frame{\titlepage}
+
+%---------------------------------------------------------
+%This block of code is for the table of contents after
+%the title page
+% \begin{frame}
+% \frametitle{Table of Contents}
+% \tableofcontents
+% \end{frame}
+%--------------------------------------------------------
+
+\begin{frame}
+    \frametitle{复习}
+    \begin{itemize}
+        \item 高级数据类型（时间和日期）
+        \item 类型转化
+        \item 授权
+    \end{itemize}
+
+\end{frame}
+\begin{frame}
+    \frametitle{小测试}
+给定某商场2021年的销售关系\texttt{sale2021(id, product\_id, time, price, unit)}：
+\begin{itemize}
+    \item 求出该商场2021年的总销售额。
+    \item 求出该商场销量前5的产品。
+    \item 找到销量最高的月份。
+\end{itemize}
+\begin{table}
+    \begin{tabular}{lllll}
+      \toprule
+      id & product\_id & time & price & unit \\
+      \midrule
+      1 & A1 & 2021-01-01 12:01:00 & 0.3 & 10 \\
+      2 & B2 & 2021-01-01 13:00:00 & 2.7 & 1 \\
+      \bottomrule
+    \end{tabular}
+\end{table}
+\end{frame}
+
+{
+    % \usebackgroundtemplate{\transparent{0.3}{\begin{picture}
+    %     \includegraphics[height=0.7\paperheight]{cover}
+    % \end{picture}    
+    % }}
+\usebackgroundtemplate{
+  \tikz[overlay,remember picture] 
+  \node[opacity=0.3, at=(current page.south east),anchor=south east, yshift=2cm,xshift=4cm] {
+    \includegraphics[height=0.6\paperheight]{cover}};
+}
+    \begin{frame}
+        \section{\textcolor{darkmidnightblue}{1. 函数与过程}}
+        Functions and procedures
+    \end{frame}
+
+}
+
+\begin{frame}[fragile]
+    \frametitle{Functions}
+
+    \begin{columns}
+        \column{.4\textwidth}
+        \begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+def add(i, j):
+    return i + j
+    \end{minted}
+        \column{.6\textwidth}
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{java}
+public int add(int i, int j) {
+    return i + j;
+}
+     \end{minted} 
+
+    \end{columns}
+
+
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT AVG(salary)
+FROM instructor
+GROUP BY length(name);
+    \end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{1.1 定义函数}
+
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT add(1, 2);
+
+CREATE FUNCTION
+add(integer, integer) RETURNS integer
+AS 'select $1 + $2;'
+LANGUAGE SQL;
+    \end{minted}
+
+可以在DataGrip左侧的的\texttt{「public」}$\rightarrow$\alert{\texttt{「routines」}}看到自定义的函数。
+
+\faIcon{lightbulb}思考：如何删除自定义的函数？
+\end{frame}
+
+
+\begin{frame}[fragile]
+也可以使用\alert{\texttt{\$\$}}，而不使用单引号，并且也可以给参数取名，甚至写成类似函数的形式：
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+CREATE FUNCTION multiply(i integer, j integer)
+RETURNS integer AS
+$$
+BEGIN
+    RETURN i * j;
+END;
+$$
+LANGUAGE plpgsql;
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{例子}
+找到教师数大于12的所有学院的名称和预算。
+
+\pause
+
+假设有一个函数\alert{\texttt{deptCount()}}，可以返回给定学院的教师数：
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT dept_name, budget
+FROM department
+WHERE deptCount(dept_name) > 12;
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+CREATE FUNCTION deptCount(varchar(20))
+RETURNS integer as
+    $$
+    DECLARE d_count integer;
+        BEGIN
+        SELECT count(*) INTO d_count
+        FROM instructor
+        WHERE instructor.dept_name = $1;
+        RETURN d_count;
+        END;
+    $$ LANGUAGE plpgsql;
+    \end{minted}
+
+\faIcon{search} 查阅资料，理解\texttt{SELECT INTO}的语法。
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{1.2 定义过程}
+
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+CREATE PROCEDURE add2(integer, integer)
+AS
+$$
+SELECT $1 + $2;
+$$ LANGUAGE SQL;
+    \end{minted}
+
+\faIcon{code} 定义上面的过程后，试着运行\texttt{SELECT add2(1, 2)}，你有什么发现？
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{使用「过程」的场景}
+现实世界中一个动作往往涉及到数据库的多次读写。比如，在淘宝下单时，数据库需要1）添加订单；２）添加配送信息。
+    
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+CREATE PROCEDURE 
+    buy(id varchar(50), product text, address text)
+AS $$
+    INSERT INTO order(id, product) VALUES($1, $2);
+    INSERT INTO deliver VALUES($2, $3);
+    $$ 
+LANGUAGE SQL;
+\end{minted}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{练习}
+西财的信息中心拟开发一个数据库过程\texttt{welcomeToCS()}，使得在录入计算机系的新生基本信息的同时，自动完成当年秋季学期CS-101课程（课程段为1）的选课。
+
+请实现上述需求。（参数包括学号和姓名）
+
+\end{frame}
+
+{\setbeamercolor{palette primary}{fg=black, bg=yellow}
+\begin{frame}[standout]
+    函数（function）返回结果，而过程（procedure）主要用来执行一些操作。
+
+    {\small \faIcon{fire} 注意：各个DBMS的具体语法与标准SQL差异较大。}
+\end{frame}
+}
+
+\begin{frame}[fragile]
+    \section{\textcolor{darkmidnightblue}{2. 触发器 (trigger)}}
+    A \alert{trigger} is a statement that the system executes automatically as a side effect of a modification to the database.
+\end{frame}
+
+\begin{frame}
+    \frametitle{触发器}
+To define a trigger, we must:
+
+\begin{itemize}
+    \item Specify when a trigger is to be executed. This is broken up into an \textbf{event} that causes the trigger to be checked and a \textbf{condition} that must be satisfied for trigger execution to proceed.
+    \item Specify the \textbf{actions} to be taken when the trigger executes.
+\end{itemize}
+
+\faIcon{bell} 比如，当学生某门课及格后（\texttt{takes}），需要自动增加她所修的总学分（\texttt{student}）。
+\end{frame}
+
+\begin{frame}[fragile]
+    \section{\textcolor{darkmidnightblue}{3. 使用程序语言访问数据库}}
+{\Huge \faIcon{java} \faIcon{python} \faIcon{rust} \faIcon{php}}
+{\Huge \faIcon{arrow-down}}
+
+{\Huge \faIcon{database}}
+\end{frame}
+
+\end{document}

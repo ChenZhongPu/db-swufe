@@ -259,6 +259,25 @@ SELECT time '08:30' + interval '02:00';
 \end{frame}
 
 \begin{frame}[fragile]
+    \frametitle{\texttt{extract()}函数}
+\alert{\texttt{extract()}}函数可以从给定\texttt{timestamp}或\texttt{interval}中抽取某个字段。基本语法是：
+
+\begin{verbatim}
+EXTRACT(field FROM source)
+\end{verbatim}
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+-- PG, MySQL, Oracle
+SELECT EXTRACT(year FROM timestamp '2008-08-08');
+
+-- SQL Server
+SELECT YEAR('2008-08-08');
+        \end{minted}
+    
+
+\end{frame}
+
+\begin{frame}[fragile]
     \frametitle{1.3 小数精度问题}
 
     \begin{tikzpicture}
