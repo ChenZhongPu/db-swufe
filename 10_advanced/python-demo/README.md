@@ -13,7 +13,7 @@ and then activate it according to the [guide](https://docs.python.org/3/library/
 Install `psycopg2` driver, which allows connection to PostgreSQL:
 
 ```sh
-pip3 install psycopg2-binary 
+pip3 install psycopg2
 ```
 
 ## Step 2

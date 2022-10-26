@@ -350,9 +350,131 @@ To define a trigger, we must:
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
     \frametitle{3.3 Python访问数据库}
     Python中访问PostgreSQL常用的驱动是\alert{\texttt{psycopg2}}。
+    
+\begin{verbatim}
+pip3 install psycopg2
+python3 main.py 
+\end{verbatim}
+
+\faIcon{code}\textbf{小任务}:阅读\href{https://github.com/ChenZhongPu/db-swufe/blob/master/10_advanced/python-demo/main.py}{main.py}，并试着完成\texttt{delete()}功能。
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{3.4 ORM}
+但是，直接在程序里面嵌入SQL代码对于大型项目是个噩梦。
+
+\begin{itemize}
+    \item SQL代码无法在编译时验证是否正确
+    \item 无法屏蔽不同DBMS的差异
+\end{itemize}
+    
+
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+cur.execute("SELECT * FROM department")
+# Retrieve query results
+records = cur.fetchall()
+\end{minted}
+
+为了解决这个问题，ORM（object-relational mapping）被提出。
+\end{frame}
+
+\begin{frame}[fragile]
+Python中最流行的ORM框架是\href{https://www.sqlalchemy.org/}{SQLAlchemy}。
+
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+dept = session.query(Department)
+              .filter_by(building='Watson')
+              .first()
+
+depts = session.query(Department)
+               .filter(Department.dept_name.like('%s'))
+\end{minted}
+
+课下有兴趣可以阅读\href{https://github.com/ChenZhongPu/db-swufe/blob/master/10_advanced/python-orm/main-orm.py}{main-orm.py}。
+\end{frame}
+
+\begin{frame}[fragile]
+    \section{\textcolor{darkmidnightblue}{4. SQL注入攻击（SQL Injection）}}
+    （恶意的）SQL语句插入了特殊的字符串，服务器执行后造成了意想不到的效果。
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{回顾}
+\begin{exampleblock}{Homework 1}
+假设数据库中存储用户名和密码的关系模式是\texttt{users(name, pswd, gender)}，请结合关系代数简述实现用户登录的思路。
+\end{exampleblock}
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+sql = f"SELECT * FROM users WHERE name = '{name}'
+        AND pswd = '{pswd}'"
+\end{minted}
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT *
+FROM users
+WHERE name='zhongpu' AND pswd='123abc';
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{登录SQL}
+
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+name = "zhongpu"
+pswd = "' or '1'='1"
+sql = f"SELECT * FROM users WHERE name='{name}'
+        AND pswd='{pswd}'"
+    \end{minted}  
+
+\faIcon{code} 上面的字符串拼接的结果是什么？并试着运行改SQL语句。
+\end{frame}
+
+\begin{frame}[fragile]
+
+如果密码是\alert{\texttt{' or '1'='1}}，SQL语句为：
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT * 
+FROM users 
+WHERE name='zhongpu' 
+AND pswd='' or '1'='1';
+\end{minted}
+
+\pause
+如果密码是\alert{\texttt{' or 1='1}}，SQL语句为：
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT *
+FROM users
+WHERE name='zhongpu'
+AND pswd='' or 1='1';
+\end{minted}
+
+\end{frame}
+
+{\setbeamercolor{palette primary}{fg=black, bg=yellow}
+\begin{frame}[standout]
+使用简单的字符串拼接构造的SQL语句有SQL注入的风险！
+
+可以使用ORM或PreparedStatement避免这个问题。
+\end{frame}
+}
+
+
+\begin{frame}[fragile]
+    \section{\textcolor{darkmidnightblue}{总结}}
+
+\begin{itemize}
+    \item 函数与过程
+    \item 动态SQL
+    \item SQL注入
+\end{itemize}
 \end{frame}
 
 \end{document}
