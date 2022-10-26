@@ -286,10 +286,73 @@ To define a trigger, we must:
 
 \begin{frame}[fragile]
     \section{\textcolor{darkmidnightblue}{3. 使用程序语言访问数据库}}
-{\Huge \faIcon{java} \faIcon{python} \faIcon{rust} \faIcon{php}}
-{\Huge \faIcon{arrow-down}}
+\begin{center}
+    {\Huge \faIcon{java} \faIcon{python} \faIcon{rust} \faIcon{php}}
+
+{\Huge \faIcon{arrows-alt-v}}
 
 {\Huge \faIcon{database}}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{3.1 背景知识}
+\begin{exampleblock}{B-S构架}
+    DBMS是经典的B-S构架。我们使用的SQL Shell或是DataGrip、Navicat等软件仅仅是个客户端。
+\end{exampleblock}
+
+类似的，使用编程语言（如Python、Java等）编写的程序也可以作为客户端与DBMS进行交互。
+
+\faIcon{eye} \textbf{小任务}：在DBGrip的左侧，在\texttt{mydb@localhost}上右键，点击「Properties」，你看到是URL是什么？你觉得需要什么信息才能唯一地标识一个数据库？
+
+\end{frame}
+
+\begin{frame}
+
+    https://github.com/ChenZhongPu/
+
+    \begin{tikzpicture}[every node/.style={scale=1.3}]
+        \node[red](proxy){jdbc:postgresql};
+        \node(t1)[right=of proxy,xshift=-1cm]{://};
+        \node[blue, right=of t1, xshift=-1cm](server){localhost};
+        \node(t2)[right=of server,xshift=-1cm]{:};
+        \node(port)[olive,right=of t2, xshift=-1cm]{5432};
+        \node(t3)[right=of port, xshift=-1cm]{:};
+        \node(db)[right=of t3, xshift=-1cm, violet]{mydb};
+
+        \node(proxyt)[above=of proxy]{协议};
+        \draw[->, thick](proxyt) -- (proxy);
+
+        \node(servert)[above=of server]{服务器};
+        \draw[->, thick](servert) -- (server);
+        
+        \node(portt)[above=of port]{端口};
+        \draw[->, thick](portt) -- (port);
+    \end{tikzpicture}
+
+当然，访问数据库的时候还需要用户名和密码。
+\end{frame}
+
+\begin{frame}
+    \frametitle{3.2 连接SQL的标准}
+\begin{itemize}
+    \item JDBC
+    \item ODBC
+\end{itemize}
+实现上述标准的程序一般称为数据库驱动（driver或connector），它们的作用是将程序中的SQL发送给DBMS，再将DBMS的执行结果返回给程序。
+
+\begin{tikzpicture}
+    \node[fill=yellow,blur shadow={shadow xshift=-0.5ex},
+    text width=16em,anchor=south west,rounded corners]
+    {不同DBMS的驱动是不同的。};
+\end{tikzpicture} 
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{3.3 Python访问数据库}
+    Python中访问PostgreSQL常用的驱动是\alert{\texttt{psycopg2}}。
 \end{frame}
 
 \end{document}

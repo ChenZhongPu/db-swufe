@@ -1008,7 +1008,7 @@ SELECT * FROM student LIMIT 5 OFFSET 2;
 -- Oracle
 SELECT * FROM student rownum <= 5;
 -- SQLServer
-SELECT top 5 * FROM student;
+SELECT TOP 5 * FROM student;
 
 -- SQL 标准
 SELECT * FROM student FETCH FIRST 5 ROWS ONLY;
@@ -1122,7 +1122,7 @@ WHERE EXISTS(SELECT 1 FROM teaches
 
 \begin{frame}[fragile]
     \frametitle{练习}
-阅读课本 P.106，试用多表查询实现下面的嵌套查询。
+阅读课本 P.104，试用多表查询实现下面的嵌套查询。
 
 \begin{minted}[bgcolor=LightGray]{sql}
 SELECT count(DISTINCT ID)
@@ -1166,9 +1166,9 @@ WITH dept_total (dept_name, value) AS
     (SELECT dept_name, sum(salary)
      FROM instructor
      GROUP BY dept_name),
-    dept_total_avg(value) as
-        (SELECT avg(value)
-         from dept_total)
+    dept_total_avg(value) AS
+    (SELECT avg(value)
+     FROM dept_total)
 SELECT dept_name
 FROM dept_total, dept_total_avg
 WHERE dept_total.value > dept_total_avg.value;
