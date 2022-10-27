@@ -310,7 +310,7 @@ To define a trigger, we must:
 
 \begin{frame}
 
-    https://github.com/ChenZhongPu/
+    https://github.com/ChenZhongPu
 
     \begin{tikzpicture}[every node/.style={scale=1.3}]
         \node[red](proxy){jdbc:postgresql};
@@ -318,7 +318,7 @@ To define a trigger, we must:
         \node[blue, right=of t1, xshift=-1cm](server){localhost};
         \node(t2)[right=of server,xshift=-1cm]{:};
         \node(port)[olive,right=of t2, xshift=-1cm]{5432};
-        \node(t3)[right=of port, xshift=-1cm]{:};
+        \node(t3)[right=of port, xshift=-1cm]{/};
         \node(db)[right=of t3, xshift=-1cm, violet]{mydb};
 
         \node(proxyt)[above=of proxy]{协议};
@@ -370,7 +370,6 @@ python3 main.py
     \item SQL代码无法在编译时验证是否正确
     \item 无法屏蔽不同DBMS的差异
 \end{itemize}
-    
 
 
 \begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
@@ -379,7 +378,7 @@ cur.execute("SELECT * FROM department")
 records = cur.fetchall()
 \end{minted}
 
-为了解决这个问题，ORM（object-relational mapping）被提出。
+为了解决这些问题，object-relational mapping被广泛应用。
 \end{frame}
 
 \begin{frame}[fragile]
@@ -401,6 +400,20 @@ depts = session.query(Department)
 \begin{frame}[fragile]
     \section{\textcolor{darkmidnightblue}{4. SQL注入攻击（SQL Injection）}}
     （恶意的）SQL语句插入了特殊的字符串，服务器执行后造成了意想不到的效果。
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{预备知识}
+
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT 1 = '1';
+
+SELECT 1 = '1'::text;
+
+SELECT * FROM instructor
+WHERE ID = ;
+    \end{minted}
+\faIcon{lightbulb} \textbf{思考}：上面的SQL语句中在\texttt{ID = }后面填入什么信息能够保证一定有结果？
 \end{frame}
 
 \begin{frame}[fragile]
@@ -455,6 +468,12 @@ FROM users
 WHERE name='zhongpu'
 AND pswd='' or 1='1';
 \end{minted}
+
+\end{frame}
+
+\begin{frame}
+\href{https://www.youtube.com/watch?v=wcaiKgQU6VE}{What Is SQL Injection?@YouTube}
+    
 
 \end{frame}
 
