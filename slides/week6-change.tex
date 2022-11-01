@@ -587,4 +587,112 @@ CREATE TABLE products (
 
 \end{frame}
 
+\begin{frame}
+    \section{\textcolor{darkmidnightblue}{4. SQL排名}} 
+
+    \begin{table}
+        \caption*{2021年双11京东手机销量排行}
+        \begin{tabular}{ll}
+          \toprule
+          型号 & 排名 \\
+          \midrule
+          iPhone 13 & 1 \\
+          Redmi K 40 & 2 \\
+          iPhone 12 & 3 \\
+          \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{4.1 RANK}
+
+    \begin{minted}[bgcolor=LightGray,]{sql}
+SELECT id, salary FROM instructor
+ORDER BY salary DESC;
+
+SELECT id, salary, 
+       RANK() OVER (ORDER BY (salary) DESC) as s_rank
+FROM instructor
+ORDER BY s_rank;
+    \end{minted}    
+
+    \pause
+    \begin{tikzpicture}
+        \node[fill=yellow,blur shadow={shadow xshift=-0.5ex},
+        text width=20em,anchor=south west,rounded corners]
+        {ORDER BY降序时会把NULL排在最前面。};
+    \end{tikzpicture} 
+
+\end{frame}
+
+\begin{frame}[fragile]
+
+有多种方案：
+\begin{minted}[bgcolor=LightGray,]{sql}
+-- 排除NULL
+SELECT salary FROM instructor
+WHERE salary IS NOT NULL
+ORDER BY salary DESC;
+
+-- 将NULL放在最后面
+SELECT id, salary FROM instructor
+ORDER BY salary DESC NULLS LAST;
+\end{minted}       
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{回顾}
+\begin{exampleblock}{Homework 4}
+找到工资最高的员工（可能不唯一）。    
+\end{exampleblock}
+    
+\begin{minted}[bgcolor=LightGray,]{sql}
+-- 是否正确？
+SELECT id FROM instructor
+ORDER BY salary DESC
+LIMIT 1;
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \begin{minted}[bgcolor=LightGray, fontsize=\small]{sql}
+-- 是否正确？
+SELECT id,
+RANK() OVER (ORDER BY salary DESC NULLS LAST) AS s_rank
+FROM instructor
+WHERE s_rank = 1;
+    \end{minted}
+
+    \pause
+    \begin{tikzpicture}
+        \node[fill=yellow,blur shadow={shadow xshift=-0.5ex},
+        text width=24em,anchor=south west,rounded corners]
+        {SELECT子句的alias不能用于WHERE子句！};
+    \end{tikzpicture} 
+
+    \begin{minted}[bgcolor=LightGray]{sql}
+-- 不合法！
+SELECT id, salary/12 AS m_salary
+FROM instructor
+WHERE m_salary > 5000;
+    \end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \begin{minted}[bgcolor=LightGray, fontsize=\small]{sql}
+SELECT id FROM 
+   (SELECT id, 
+   RANK() OVER (ORDER BY salary DESC NULLS LAST) AS s_rank
+   FROM instructor) AS a
+WHERE s_rank = 1;
+    \end{minted}
+    
+
+\end{frame}
 \end{document}
