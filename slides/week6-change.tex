@@ -113,7 +113,7 @@
     \begin{minted}[bgcolor=LightGray]{sql} 
 SELECT sum(balance) FROM account;
 
-SELECT count(salary) FROM account;
+SELECT count(balance) FROM account;
 
 SELECT count(*) FROM account;
     \end{minted}
@@ -231,7 +231,7 @@ INSERT INTO instructor VALUES
 -- 插入其他查询的结果
 INSERT INTO instructor
 SELECT ID, name, dept_name, 18000
-from STUDENT 
+FROM student
 WHERE dept_name = 'Music' AND tot_cred > 144;
     \end{minted} 
 
