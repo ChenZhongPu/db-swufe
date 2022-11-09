@@ -171,7 +171,7 @@ AND year = 2017;
 -- 相同名称属性的值相等
 SELECT name, course_id
 FROM student, takes
-WHERE name.id = takes.id;
+WHERE student.id = takes.id;
 \end{minted}
 
 \end{frame}
@@ -284,7 +284,7 @@ WHERE takes.course_id = course.course_id;
 
 SELECT name, title
 FROM (student NATURAL JOIN takes) 
-    JOIN takes USING (course_id);
+    JOIN course USING (course_id);
     \end{minted}
     
     \begin{tikzpicture}
@@ -510,10 +510,18 @@ WHERE student.id = takes.id;
 \end{frame}
 }
 
-\begin{frame}
+\begin{frame}[fragile]
     \frametitle{思考}
 
     {\large \faIcon[regular]{lightbulb}}  部分数据库系统（如 MySQL）没有实现 \texttt{full outer join}，只实现了 \texttt{left} 和 \texttt{right outer join}。那么如何在这样的数据库系统中写出 \texttt{full outer join}?
+
+    {\large \faIcon[regular]{lightbulb}} 下面的查询是否合法？
+
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+SELECT * 
+FROM student LEFT JOIN takes
+WHERE student.id = takes.id;
+    \end{minted}
 
 \end{frame}
 

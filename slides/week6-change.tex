@@ -554,7 +554,7 @@ CREATE TABLE products (
     \frametitle{例子}
 
 \begin{minted}[bgcolor=LightGray, baselinestretch=.9, fontsize=\small]{sql}
-CREATE TABLE section (
+CREATE TABLE section1 (
     course_id    varchar(8),
     sec_id       varchar(8),
     semester     varchar(6),
@@ -584,6 +584,36 @@ CREATE TABLE products (
     CONSTRAINT valid_discount CHECK (price > discounted_price)
 );
 \end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{3.4 再谈外码}
+关系\texttt{section}中的\texttt{course\_id} 为外码，参照关系 \texttt{course}，那么能否直接将\texttt{course}中某门课程删除？
+
+\begin{minted}[bgcolor=LightGray,]{sql}
+INSERT INTO course
+VALUES ('CS-600', 'Advanced DB', 'Comp. Sci.', 4);
+
+INSERT INTO section1 VALUES ('CS-600', '1', 'Spring', 
+2022, 'Watson', '100', 'A');
+
+DELETE FROM course
+WHERE course_id = 'CS-600';
+\end{minted}  
+
+\end{frame}
+
+\begin{frame}
+删除外码所引用的元组时，有四种可能的行为：
+    \begin{itemize}
+        \item（默认）禁止删除
+        \item \texttt{ON DELETE CASCADE}
+        \item \texttt{ON DELETE SET NULL}
+        \item \texttt{ON DELETE SET DEFAULT}
+    \end{itemize}
+
+不难发现，\texttt{UPDATE}命令也是类似的。
 
 \end{frame}
 
