@@ -10,7 +10,9 @@
 \usetikzlibrary{arrows}
 \usetikzlibrary {arrows.meta}
 \usetikzlibrary{calc,shadows.blur,fit,positioning}
+\usetikzlibrary {shapes.multipart}
 \usetikzlibrary{chains}
+\usetikzlibrary{er}
 \usepackage{minted}
 \usepackage{fontawesome5}
 \usepackage{booktabs}
@@ -87,7 +89,7 @@
         \LARGE {\faIcon{database}}
     \end{center}
     \begin{enumerate}
-        \item 如何使用数据库
+        \item 如何使用数据库 (SQL)
         \item 如何设计数据库
         \item 如何实现数据库
     \end{enumerate}
@@ -221,7 +223,7 @@
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
     \frametitle{2.1 实体与实体集}
 与关系模式类似，实体（entity）通过一组属性表示。
 
@@ -229,6 +231,285 @@
 实体是现实世界中可区别所有其他对象的一个“事物”或“对象”。实体集（entity set）是相同类型的一个实体集合。    
 \end{exampleblock}
 
+\begin{columns}
+    \column{.5\textwidth}
+    \begin{tikzpicture}[every pin edge/.style=draw, text depth=1pt,
+        every attribute/.style={fill=black!20,draw=black},
+        every entity/.style={fill=blue!20,draw=blue,thick},]
+        \node[entity,pin={[attribute]30:\underline{ID}},pin={[attribute]90:name}, pin={[attribute]140:salary}] {instructor};
+    \end{tikzpicture}
+    \column{.5\textwidth}
+    \begin{tikzpicture}[
+        comment/.style={rectangle, draw=black, rounded corners,
+        text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white}]
+        \node [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+        {
+            instructor
+            \nodepart{second} \underline{ID} \\ name \\ salary
+        };
+    \end{tikzpicture}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{2.2 联系与联系集}
+\begin{exampleblock}{联系与联系集}
+    联系（\texttt{relationship}）是指多个实体间的相互关联。联系集（\texttt{relationship set}）是相同类型联系的集合。
+\end{exampleblock}
+
+
+\begin{tikzpicture}
+    \matrix (instructor)[row sep=.1cm, every node/.style={draw, fill=blue!20, rectangle split, rectangle split parts=2,rectangle split horizontal, text width=2cm,}]
+    {
+      \node (crick) {76766 \nodepart{two} Crick}; \\
+      \node (katz) {45565 \nodepart{two} Katz}; \\
+      \node (kim) {98345 \nodepart{two} Kim}; \\
+      \node (ein) {22222 \nodepart{two} Einstein}; \\
+    };
+    \node (tinstructor)[below=of instructor, yshift=1.2cm] {instructor};
+
+    \matrix (student)[right=of instructor, xshift=0.5cm, row sep=.1cm, every node/.style={draw, fill=blue!20, rectangle split, rectangle split parts=2,rectangle split horizontal, text width=2cm,}] {
+        \node (tanaka) {98988 \nodepart{two} Tanaka}; \\
+        \node (shankar) {12345 \nodepart{two} Shankar}; \\
+        \node (zhang) {00128 \nodepart{two} Zhang}; \\
+        \node (aoi) {76653 \nodepart{two} Aoi}; \\
+        \node (pel) {44553 \nodepart{two} Peltier}; \\
+    };
+    \node[below=of student, yshift=1.2cm] {student};
+
+    \draw (crick) -- (tanaka);
+    \draw (katz) -- (shankar);
+    \draw (katz) -- (zhang);
+    \draw (kim) -- (aoi);
+    \draw (ein) -- (pel);
+    \node [right=of tinstructor, red] {advisor};
+  \end{tikzpicture}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{E-R图}
+    \begin{tikzpicture}[
+        comment/.style={rectangle, draw=black, rounded corners,
+        text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white}]
+        \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+        {
+            instructor
+            \nodepart{second} \underline{ID} \\ name \\ salary
+        };
+
+        \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+
+        \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+            student
+            \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+        };
+
+        \draw (instructor) -- (advisor);
+        \draw (advisor) -- (student);
+    \end{tikzpicture}    
+
+    实体集instructor和实体集student及其联系集advisor的\alert{E-R}图。
+
+    \faIcon{search} 查词典：矩形和菱形的英文分别怎么说？
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{练习}
+    考虑student实体集和section实体集，以及表示「某学生选修了某课程段」的联系takes。根据上述文字绘制E-R图。
+
+    \faIcon{lightbulb} 思考：成绩（grade）应该属于谁？
+    
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{tikzpicture}
+    \node (student) [draw, rounded corners,
+    text centered, anchor=north, text=black, text width=3cm, fill=blue!20, inner sep=0.2cm] {student};
+
+    \node (takes) [draw, diamond, aspect=1.5, fill=blue!20, right=of student] {takes};
+
+    \node (section) [draw, rounded corners,
+    text centered, anchor=north, text=black, text width=3cm, fill=blue!20, inner sep=0.2cm, right=of takes] {section};
+
+    \draw (student) -- (takes);
+    \draw (takes) -- (section);
+
+    \node (grade) [draw, above=of takes]{grade};
+    \draw [dashed] (grade) -- (takes);
+\end{tikzpicture}
+
+\alert{联系的描述性属性（descriptive attribute）}
+
+
+\begin{tikzpicture}
+    \node[fill=blue!30,blur shadow={shadow xshift=-0.5ex},
+    text width=26em,anchor=south west,rounded corners]
+    {E-R图可能很多页。这样一个实体可能在不同地方出现，只有第一次出现需要属性，其他地方仅出现实体名字就行。};
+\end{tikzpicture}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{2.3 属性}
+\begin{exampleblock}{域（domain）}
+    对于每个属性，都有一个可允许的取值集合，叫域（domain）。   
+\end{exampleblock}
+    
+按不同标准，它可以分为：
+
+\begin{itemize}
+    \item \alert{简单}（simple）属性：不可再分；\alert{复合}（composite）属性：可以再划分为更小的部分（或其他属性）
+    \item \alert{单值}（single-valued）属性；\alert{多值}（multi-valued）属性
+\end{itemize}
+
+\faIcon{lightbulb} 思考：有哪些复合属性和多值属性的例子？
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \begin{columns}
+        \column{.4\textwidth}
+        \begin{tikzpicture}[
+            comment/.style={rectangle, draw=black, rounded corners,
+            anchor=north, text=black, anchor=west}, every second node part/.style={fill=white}]
+            \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+            {
+                instructor
+                \nodepart{second} 
+                \begin{tabular}{l}
+                    \underline{ID} \\
+                    name \\ 
+                    \hspace{4mm} first\_name \\
+                    \hspace{4mm} middle\_name
+                    \\
+                    \hspace{4mm} last\_name \\
+                    salary \\
+                    \{ phone\_number \} \\
+                    date\_of\_birth \\
+                    age()\\
+                \end{tabular}
+            };
+        \end{tikzpicture}
+        \column{.6\textwidth}
+        \faIcon{lightbulb} 王大锤同学在阅读课本的时候，发现有这么一句话：\alert{关系的每一个分量必须是一个不可分的数据项，也就是说，不允许表中还有表}（即属性的原子性）。那么为什么E-R图中可以出现复合属性和多值属性呢？
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \begin{columns}
+        \column{.4\textwidth}
+        \begin{tikzpicture}[
+            comment/.style={rectangle, draw=black, rounded corners,
+            anchor=north, text=black, anchor=west}, every second node part/.style={fill=white}]
+            \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+            {
+                instructor
+                \nodepart{second} 
+                \begin{tabular}{l}
+                    \underline{ID} \\
+                    name \\ 
+                    \hspace{4mm} first\_name \\
+                    \hspace{4mm} middle\_name
+                    \\
+                    \hspace{4mm} last\_name \\
+                    salary \\
+                    \{ phone\_number \} \\
+                    date\_of\_birth \\
+                    age()\\
+                \end{tabular}
+            };
+        \end{tikzpicture}
+        \column{.6\textwidth}
+        \faIcon{lightbulb} 如果实体集有了生日（birth）属性，那么是否需要年龄（age）属性？ 对于之前的E-R图，教师实体集是否需要有「指导了多少名学生」这一属性？
+
+        \pause
+
+        \alert{派生（derived）属性}
+    \end{columns}
+
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{2.4 映射基数}
+
+\begin{exampleblock}{映射基数（mapping cardinality）}
+    映射基数（mapping cardinality）表示一个实体通过一个联系集能关联的实体的个数。  
+\end{exampleblock}
+
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white}]
+    \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+
+    \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+
+    \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+        student
+        \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+    };
+
+    \draw (instructor) -- (advisor);
+    \draw (advisor) -- (student);
+\end{tikzpicture}    
+
+\alert{映射基数}是用来表示：一个教师能够指导多少学生？
+一个学生能够被多少教师指导？
+\end{frame}
+
+\begin{frame}
+            \begin{tikzpicture}[
+            comment/.style={rectangle, draw=black, rounded corners,
+            text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white}, scale=0.8, every node/.style={scale=0.8}]
+            \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+            {
+                instructor
+                \nodepart{second} \underline{ID} \\ name \\ salary
+            };
+        
+            \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+        
+            \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+                student
+                \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+            };
+        
+            \draw [Latex-] (instructor) -- (advisor);
+            \draw [-Latex] (advisor) -- (student);
+            \node [below=of advisor] {One-to-One};
+        \end{tikzpicture}      
+        
+        \begin{tikzpicture}[
+            comment/.style={rectangle, draw=black, rounded corners,
+            text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white}, scale=0.8, every node/.style={scale=0.8}]
+            \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+            {
+                instructor
+                \nodepart{second} \underline{ID} \\ name \\ salary
+            };
+        
+            \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+        
+            \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+                student
+                \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+            };
+        
+            \draw [Latex-] (instructor) -- (advisor);
+            \draw (advisor) -- (student);
+            \node [below=of advisor] {One-to-Many};
+        \end{tikzpicture}
+
+        猜测Many-to-Many和Many-to-One应该如何表示？
 \end{frame}
 
 \end{document}
