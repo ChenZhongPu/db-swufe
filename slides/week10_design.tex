@@ -31,6 +31,7 @@
 \definecolor{darkmidnightblue}{rgb}{0.0, 0.2, 0.4}
 \definecolor{LightGray}{gray}{0.9}
 
+\usepackage[normalem]{ulem}
 
 %------------------------------------------------------------
 %This block of code defines the information to appear in the
@@ -467,7 +468,10 @@
 \end{frame}
 
 \begin{frame}
-            \begin{tikzpicture}[
+    
+    \begin{columns}
+        \column{.6\textwidth}
+        \begin{tikzpicture}[
             comment/.style={rectangle, draw=black, rounded corners,
             text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white}, scale=0.8, every node/.style={scale=0.8}]
             \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
@@ -508,8 +512,273 @@
             \draw (advisor) -- (student);
             \node [below=of advisor] {One-to-Many};
         \end{tikzpicture}
-
-        猜测Many-to-Many和Many-to-One应该如何表示？
+        \column{.4\textwidth}
+        \faIcon{lightbulb} 猜测Many-to-Many和Many-to-One应该如何表示？
+    \end{columns}
 \end{frame}
 
+% {\setbeamercolor{palette primary}{fg=black, bg=yellow}
+% \begin{frame}[standout]
+% 观察p.216，图7.6可知，课本中箭头的语义正好与「Database System Concepts」相反。
+% \end{frame}
+% }
+
+\begin{frame}[fragile]
+    \frametitle{2.5 基数约束}
+
+约束可以使用一对数\alert{min..max}表示。
+
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white}]
+    \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+
+    \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+
+    \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+        student
+        \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+    };
+
+    \draw (instructor) -- node[above] {0..$\ast$} ++ (advisor);
+    \draw (advisor) -- node [above] {1..1} ++ (student);
+\end{tikzpicture}   
+
+按教材的规定，每个教师都恰好有一个学生，且每个学生被0到多个教师指导；但《Database System Concepts》一书中恰好相反。
+\end{frame}
+
+\begin{frame}
+实体的「全」参与，使用\alert{两条线}表示：
+    
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white}]
+    \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+
+    \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+
+    \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+        student
+        \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+    };
+
+    \draw (instructor) -- (advisor);
+    \draw [double, double distance = 1pt] (advisor) -- (student);
+\end{tikzpicture}   
+
+上面的E-R图表示每个学生都有一个导师。
+\end{frame}
+
+\begin{frame}
+    \frametitle{2.6 E-R软件}
+在线工具：
+
+\begin{itemize}
+    \item LucidChart
+    \item Draw.io（推荐）
+\end{itemize}
+    
+专业工具：
+
+\begin{itemize}
+    \item IBM Rational Rose Modeler
+    \item Microsoft Visio
+    \item ERWin
+    \item SmartDraw    
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{columns}
+    \column{.3\textwidth}
+    DataGrip的可视化：点击右边栏 tables，右键选择 Diagrams，点击 Show Visualization。
+    \column{.7\textwidth}
+    \includegraphics[width=.9\textwidth]{week10/uml}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}
+    \section{\textcolor{darkmidnightblue}{3. 主码}}
+    与关系类似，E-R模型中也有主码的概念，用来唯一标识一个实体或联系。
+\end{frame}
+
+\begin{frame}
+    \frametitle{3.1 实体集的主码}
+之前学习的“关系模式”的码（包括候选码、主码）的概念可以直接用于实体集。
+
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white}]
+    \node [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+\end{tikzpicture}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{3.2 联系集的主码}
+\begin{block}{联系集的超码}
+$PK(E_1) \cup PK(E_2) \cup \dots \cup PK(E_n)$构成联系集的超码。    
+\end{block}
+    
+\alert{情况一：One-to-Many或Many-to-One}
+
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white}, scale=0.8, every node/.style={scale=0.8}]
+    \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+
+    \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+
+    \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+        student
+        \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+    };
+
+    \draw [Latex-] (instructor) -- (advisor);
+    \draw (advisor) -- (student);
+\end{tikzpicture}   
+
+\faIcon{lightbulb} Many还是One一侧实体集的主码可以构成联系集的主码？
+\end{frame}
+
+\begin{frame}
+\faIcon{lightbulb} 思考：对于One-to-One和Many-to-Many应该如何选择主码？
+
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white}, scale=0.8, every node/.style={scale=0.8}]
+    \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+
+    \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+
+    \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+        student
+        \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+    };
+
+    \draw [Latex-] (instructor) -- (advisor);
+    \draw [-Latex] (advisor) -- (student);
+\end{tikzpicture}   
+
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white}, scale=0.8, every node/.style={scale=0.8}]
+    \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+
+    \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+
+    \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+        student
+        \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+    };
+
+    \draw (instructor) -- (advisor);
+    \draw (advisor) -- (student);
+\end{tikzpicture}  
+
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{3.3 弱实体集}
+考虑\texttt{section}，它需要依赖另外一个实体而存在，我们把这样的实体称为\alert{弱实体集}（weak entity set）。
+    
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white},]
+    \node (course) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+    {
+        course
+        \nodepart{second} \underline{course\_id} \\ title \\ credits
+    };
+
+    \node (seccourse) [fill=blue!20, draw, diamond, right=of course, aspect=1.5, double, double distance=1pt] {sec\_course}; 
+
+    \node (section) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of seccourse, double, double distance=1pt] {
+        section
+        \nodepart{second} \dashuline{section\_id} \\ \dashuline{year} \\ \dashuline{semester} 
+    };
+
+    \draw [Latex-] (course) -- (seccourse);
+    \draw [double, double distance=1pt] (seccourse) -- (section);
+\end{tikzpicture}  
+
+\textbf{弱实体集的主码由标识实体集（identifying entity set）的主码加上该弱实体集的分辨符（discriminator）构成。}
+\end{frame}
+
+\begin{frame}
+    \frametitle{3.4 去除冗余属性}
+在使用E-R模型的时候，\textbf{要确保实体间不存在冗余属性}（a good entity-relationship design does not contain redundant attributes）。
+
+比如考虑：\texttt{instructor(ID, name, dept\_name, salary)}和\texttt{department(dept\_name, building, budget)}。
+
+\end{frame}
+
+\begin{frame}
+
+    \includegraphics[width=.8\textwidth]{week10/er}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{练习}
+    \faIcon{basketball-ball} 考虑NBA比赛中「记录球员参加比赛的得分」这一需求，绘制E-R图。
+
+
+\includegraphics[width=.99\textwidth]{week10/nba}
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \begin{tikzpicture}[
+        comment/.style={rectangle, draw=black, rounded corners,
+        text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white},]
+        \node (match) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+        {
+            match
+            \nodepart{second} \underline{match\_id} \\ date \\ stadium \\ opponent \\ own\_socre \\ opp\_score
+        };
+    
+        \node (played) [fill=blue!20, draw, diamond, right=of match, aspect=1.5,] {played}; 
+    
+        \node (player) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of played] {
+            player
+            \nodepart{second} \underline{player\_id} \\ name \\ age \\ season\_score()
+        };
+    
+        \draw (match) -- (played);
+        \draw (played) -- (player);
+
+        \node (score) [draw, above=of played, inner sep=.3cm] {score};
+        \draw [dashed] (score) -- (played);
+    \end{tikzpicture}  
+
+\end{frame}
 \end{document}
