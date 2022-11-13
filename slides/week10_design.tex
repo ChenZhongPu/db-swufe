@@ -717,7 +717,7 @@ $PK(E_1) \cup PK(E_2) \cup \dots \cup PK(E_n)$构成联系集的超码。
 
     \node (section) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of seccourse, double, double distance=1pt] {
         section
-        \nodepart{second} \dashuline{section\_id} \\ \dashuline{year} \\ \dashuline{semester} 
+        \nodepart{second} \dashuline{sec\_id} \\ \dashuline{year} \\ \dashuline{semester} 
     };
 
     \draw [Latex-] (course) -- (seccourse);
@@ -729,7 +729,7 @@ $PK(E_1) \cup PK(E_2) \cup \dots \cup PK(E_n)$构成联系集的超码。
 
 \begin{frame}
     \frametitle{3.4 去除冗余属性}
-在使用E-R模型的时候，\textbf{要确保实体间不存在冗余属性}（a good entity-relationship design does not contain redundant attributes）。
+在使用E-R模型的时候，\textbf{要确保实体间不存在冗余属性}（\alert{a good entity-relationship design does not contain redundant attributes}）。
 
 比如考虑：\texttt{instructor(ID, name, dept\_name, salary)}和\texttt{department(dept\_name, building, budget)}。
 
@@ -781,7 +781,7 @@ $PK(E_1) \cup PK(E_2) \cup \dots \cup PK(E_n)$构成联系集的超码。
 
         \node (section) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, below left=of takes, double, double distance=1pt] {
             section
-            \nodepart{second} \dashuline{section\_id} \\ \dashuline{year} \\ \dashuline{semester} 
+            \nodepart{second} \dashuline{sec\_id} \\ \dashuline{year} \\ \dashuline{semester} 
         };
 
         \draw (instructor) -- (teaches);
@@ -854,5 +854,285 @@ $PK(E_1) \cup PK(E_2) \cup \dots \cup PK(E_n)$构成联系集的超码。
         \draw [dashed] (score) -- (played);
     \end{tikzpicture}  
 
+\end{frame}
+
+\begin{frame}
+    \section{\textcolor{darkmidnightblue}{4. E-R图转化为关系模式}}
+    \begin{tikzpicture}[>=stealth,
+        node distance = 3mm and 3mm,
+          start chain = A going below right,
+    every node/.style = {draw, text width=24mm, minimum height=12mm, align=center,
+                         inner sep=1mm, fill=white, drop shadow={fill=black},  on chain=A},
+                            ]
+    \node (nreq) {需求分析}; % A-1
+    \node {概念设计};
+    \node {逻辑设计};
+    \node {物理设计};
+    %
+    \foreach \i [count=\j] in {2,...,4}
+    {
+    %   \draw[->, thick] (A-\i) -| (A-\j);
+      \draw[->, thick] (A-\j) -| (A-\i);
+    }
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+    \frametitle{4.1 具有简单属性的强实体集}
+
+    \begin{tikzpicture}[
+        comment/.style={rectangle, draw=black, rounded corners,
+        text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white}]
+        \node [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+        {
+            instructor
+            \nodepart{second} \underline{ID} \\ name \\ salary
+        };
+    \end{tikzpicture}
+
+    \texttt{instructor(\underline{ID}, name, salary)}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{4.2 具有复杂属性的强实体集}
+    \begin{columns}
+        \column{.4\textwidth}
+        \begin{tikzpicture}[
+            comment/.style={rectangle, draw=black, rounded corners,
+            anchor=north, text=black, anchor=west}, every second node part/.style={fill=white}]
+            \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}]
+            {
+                instructor
+                \nodepart{second} 
+                \begin{tabular}{l}
+                    \underline{ID} \\
+                    name \\ 
+                    \hspace{4mm} first\_name \\
+                    \hspace{4mm} middle\_name
+                    \\
+                    \hspace{4mm} last\_name \\
+                    salary \\
+                    \{ phone\_number \} \\
+                    date\_of\_birth \\
+                    age()\\
+                \end{tabular}
+            };
+        \end{tikzpicture}
+        \column{.6\textwidth}
+        \begin{itemize}
+            \item \texttt{instructor(\underline{ID}, first\_name, middle\_name, last\_name, salary, date\_of\_birth)}
+            \item \texttt{instructor\_phone(ID, phone\_number)}
+        \end{itemize}
+
+        \faIcon{lightbulb} 思考：关系\texttt{instructor\_phone}的主码是什么？
+    \end{columns}
+
+\end{frame}
+\begin{frame}
+    \frametitle{4.3 弱实体集}
+    设A是具有属性$a_1,a_2,\dots, a_m$的弱实体集，设B是A所依赖的强实体集，B的主码包括属性$b_1,b_2,\dots, b_n$。那么A对应的关系模式包括属性：
+
+    \[\{a_1,a_2, \dots, a_m\} \cup \{b_1,b_2,\dots, b_n \}\]
+
+
+    \begin{columns}
+        \column{.6\textwidth}
+        \begin{tikzpicture}[
+            comment/.style={rectangle, draw=black, rounded corners,
+            text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white},scale=0.8, every node/.style={scale=0.8}]
+            \node (course) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+            {
+                course
+                \nodepart{second} \underline{course\_id} \\ title \\ credits
+            };
+        
+            \node (seccourse) [fill=blue!20, draw, diamond, right=of course, aspect=1.5, double, double distance=1pt] {sec\_course}; 
+        
+            \node (section) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of seccourse, double, double distance=1pt] {
+                section
+                \nodepart{second} \dashuline{sec\_id} \\ \dashuline{year} \\ \dashuline{semester} 
+            };
+        
+            \draw [Latex-] (course) -- (seccourse);
+            \draw [double, double distance=1pt] (seccourse) -- (section);
+        \end{tikzpicture}  
+        \column{.4\textwidth}   
+        \texttt{section(\underline{course\_id}, \underline{sec\_id}, \underline{year}, \underline{semester})}
+    \end{columns}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{4.4 联系集}
+    设R是联系集，设$a_1, a_2, \dots, a_m$是所有参与R的实体集的主码的并集，设R的描述性属性（如果有）为$b_1, b_2, \dots, b_n$，那么R对应的关系模式包括属性：
+
+    \[\{a_1, a_2, \dots, a_m\} \cup \{ b_1, b_2, \dots, b_n \}\]
+
+    \begin{columns}
+        \column{.6\textwidth}
+        \begin{tikzpicture}[
+            comment/.style={rectangle, draw=black, rounded corners,
+            text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white}, scale=0.8, every node/.style={scale=0.8}]
+            \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+            {
+                instructor
+                \nodepart{second} \underline{ID} \\ name \\ salary
+            };
+        
+            \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+        
+            \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+                student
+                \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+            };
+        
+            \draw [Latex-] (instructor) -- (advisor);
+            \draw (advisor) -- (student);
+        \end{tikzpicture}   
+        \column{.4\textwidth}
+        \faIcon{comment-dots} 回忆一下二元联系中R的主码如何选择？
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}
+通过上面的方法，可以得到所有\textbf{联系集}的关系模式：
+\begin{itemize}
+    \item \texttt{teaches(\underline{ID}, \underline{course\_id}, \underline{sec\_id}, semeter, year)}
+    \item \texttt{takes(\underline{ID}, \underline{course\_id}, \underline{sec\_id}, \underline{semester}, \underline{year}, grade)}
+    \item \texttt{advisor(\underline{s\_ID}, i\_ID)}
+    \item \dots
+    \item \texttt{inst\_dept(\underline{ID}, dept\_name)}
+    \item \texttt{course\_dept(\underline{course\_id}, dept\_name)}
+\end{itemize}
+
+注意到很多关系模式在大学数据库中并没有出现，所以一个自然而然的问题是：\alert{到底哪些模式应该保留，而哪些模式应该删除呢？}
+\end{frame}
+
+\begin{frame}
+    \frametitle{4.5 模式的冗余}
+
+\begin{exampleblock}{冗余}
+    连接弱实体集与其依赖的强实体集的联系集的模式是冗余的。
+\end{exampleblock}
+
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white},]
+    \node (course) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+    {
+        course
+        \nodepart{second} \underline{course\_id} \\ title \\ credits
+    };
+
+    \node (seccourse) [fill=blue!20, draw, diamond, right=of course, aspect=1.5, double, double distance=1pt] {sec\_course}; 
+
+    \node (section) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of seccourse, double, double distance=1pt] {
+        section
+        \nodepart{second} \dashuline{sec\_id} \\ \dashuline{year} \\ \dashuline{semester} 
+    };
+
+    \draw [Latex-] (course) -- (seccourse);
+    \draw [double, double distance=1pt] (seccourse) -- (section);
+\end{tikzpicture}  
+
+\faIcon{edit} 提示：比较\texttt{sec\_course}和\texttt{section}的关系模式的异同。
+\end{frame}
+
+\begin{frame}
+    \frametitle{4.6 模式的合并}
+Many-to-One的联系可以让联系和Many一侧的实体合并。
+    
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white},]
+    \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+
+    \node (insdept) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {ins\_dept}; 
+
+    \node (department) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of insdept] {
+        department
+        \nodepart{second} \underline{dept\_name} \\ building \\ budget 
+    };
+
+    \draw [double, double distance=1.2pt] (instructor) -- (insdept);
+    \draw [-Latex] (insdept) -- (department);
+
+    \node [red, below right=of instructor] (merge) {合并（取并集）};
+
+    \draw [draw, red] (instructor) -- (merge);
+    \draw [draw, red] (insdept) -- (merge);
+\end{tikzpicture}   
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{思考}
+One-to-One的联系能否合并？如果能的话，如何合并？
+    
+\begin{tikzpicture}[
+    comment/.style={rectangle, draw=black, rounded corners,
+    text centered, anchor=north, text=black, text width=2cm}, every second node part/.style={fill=white},]
+    \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+    {
+        instructor
+        \nodepart{second} \underline{ID} \\ name \\ salary
+    };
+
+    \node (advisor) [fill=blue!20, draw, diamond, right=of instructor, aspect=1.5] {advisor}; 
+
+    \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of advisor] {
+        student
+        \nodepart{second} \underline{ID} \\ name \\ tot\_cred 
+    };
+
+    \draw [Latex-] (instructor) -- (advisor);
+    \draw [-Latex] (advisor) -- (student);
+\end{tikzpicture}   
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{练习}
+根据下面的E-R图写出关系模式。
+
+    \begin{tikzpicture}[
+        comment/.style={rectangle, draw=black, rounded corners,
+        text centered, anchor=north, text=black, text width=3cm}, every second node part/.style={fill=white},]
+        \node (match) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+        {
+            match
+            \nodepart{second} \underline{match\_id} \\ date \\ stadium \\ opponent \\ own\_socre \\ opp\_score
+        };
+    
+        \node (played) [fill=blue!20, draw, diamond, right=of match, aspect=1.5,] {played}; 
+    
+        \node (player) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, right=of played] {
+            player
+            \nodepart{second} \underline{player\_id} \\ name \\ age \\ season\_score()
+        };
+    
+        \draw (match) -- (played);
+        \draw (played) -- (player);
+
+        \node (score) [draw, above=of played, inner sep=.3cm] {score};
+        \draw [dashed] (score) -- (played);
+    \end{tikzpicture}  
+
+\end{frame}
+
+
+\begin{frame}
+    \section{\textcolor{darkmidnightblue}{小结}}
+    \begin{itemize}
+        \item E-R模型
+        \item 将E-R图转化成关系模式
+        \item E-R模型的替代品（如UML图）
+    \end{itemize}
 \end{frame}
 \end{document}
