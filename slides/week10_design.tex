@@ -517,12 +517,6 @@
     \end{columns}
 \end{frame}
 
-% {\setbeamercolor{palette primary}{fg=black, bg=yellow}
-% \begin{frame}[standout]
-% 观察p.216，图7.6可知，课本中箭头的语义正好与「Database System Concepts」相反。
-% \end{frame}
-% }
-
 \begin{frame}[fragile]
     \frametitle{2.5 基数约束}
 
@@ -741,9 +735,89 @@ $PK(E_1) \cup PK(E_2) \cup \dots \cup PK(E_n)$构成联系集的超码。
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 
-    \includegraphics[width=.8\textwidth]{week10/er}
+    \begin{tikzpicture}[
+        comment/.style={rectangle, draw=black, rounded corners,
+        text centered, anchor=north, text=black, text width=2.5cm}, every second node part/.style={fill=white},  scale=0.6, every node/.style={scale=0.6}]
+        \node (department) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white},]
+        {
+            department
+            \nodepart{second} \underline{dept\_name} \\ building \\ budget
+        };
+        \node (studept) [diamond, draw, below right=of department, aspect=1.6, fill=blue!20] {stud\_dept};
+
+        \node (student) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, below right=of studept]
+        {
+            student
+            \nodepart{second} \underline{ID} \\ name \\ tot\_cred
+        };
+
+        \draw [Latex-] (department) -- (studept);
+        \draw [double, double distance=1.2pt] (studept) -- (student);
+
+        \node (instdept) [diamond, draw, below left=of department, aspect=1.6, fill=blue!20] {inst\_dept};
+
+        \node (instructor) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, below left=of instdept]
+        {
+            instructor
+            \nodepart{second} \underline{ID} \\ name \\ salary
+        };
+
+        \draw [Latex-] (department) -- (instdept);
+        \draw [double, double distance=1.2pt] (instdept) -- (instructor);
+
+        \node (advisor) [diamond, draw, below=of department, aspect=1.6, fill=blue!20, ] {advisor};
+
+        \draw [Latex-] (instructor) -- (advisor);
+        \draw (advisor) -- (student);
+
+        \node (teaches) [diamond, draw, right=of instructor, aspect=1.6, fill=blue!20,] {teaches};
+        
+        \node (takes) [diamond, draw, left=of student, aspect=1.6, fill=blue!20,] {takes};
+
+        \node (grade) [left=of takes, draw] {grade};
+        \draw [dashed] (takes) -- (grade);
+
+        \node (section) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, below left=of takes, double, double distance=1pt] {
+            section
+            \nodepart{second} \dashuline{section\_id} \\ \dashuline{year} \\ \dashuline{semester} 
+        };
+
+        \draw (instructor) -- (teaches);
+        \draw [double, double distance=1.2pt] (teaches) -- (section);
+
+        \draw (student) -- (takes);
+        \draw (takes) -- (section);
+
+        \node (coursedept) [diamond, draw, left=of department, xshift=-7cm, aspect=1.6, fill=blue!20,] {course\_dept};
+
+        \draw [-Latex] (coursedept) -- (department);
+
+        \node (course) [comment, rectangle split, rectangle split parts=2, rectangle split part fill={blue!20,white}, below =of coursedept, yshift=-3cm,]
+        {
+            course
+            \nodepart{second} \underline{ID} \\ name \\ salary
+        };
+
+        \draw [double, double distance=1.2pt] (coursedept) -- (course);
+
+        \node (seccourse) [fill=blue!20, draw, diamond, below right=of course, aspect=1.5, double, double distance=1pt] {sec\_course}; 
+
+        \draw [Latex-] (course) -- (seccourse);
+
+        \draw [double, double distance=1.2pt] (seccourse) -- (section);
+        
+        \node (prereq) [diamond, draw, below=of course, aspect=1.6, fill=blue!20,] {prereq};
+
+        \draw (course) -- node [right] {prereq\_id} ++ (prereq);
+        
+        \draw (prereq.west) -- node [below] {course\_id} ++(-1,0) |- ($ (course.west) + (-.6, 0)$) -- (course.west);
+
+        \node [red, right=of section, align=left] {忽略了time\_slot和 \\classroom两个实体。}; 
+
+    \end{tikzpicture}
+
 
 \end{frame}
 
