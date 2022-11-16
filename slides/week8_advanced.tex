@@ -234,7 +234,11 @@ time '08:30'
     \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT current_date, current_time, current_timestamp;
 
-SELECT current_time at time zone 'UTF-8';
+SELECT current_time at time zone 'CCT';
+SELECT current_time at time zone 'Asia/Shanghai';
+
+SELECT CAST('2008-08-08' AS date);
+SELECT date '2008/08/08';
     \end{minted}
 
 \faIcon{question-circle} 查阅资料，如何得到2008年8月8日距今有多少天？距今100天后是哪天？
