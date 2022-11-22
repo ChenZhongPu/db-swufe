@@ -681,6 +681,25 @@ WHERE name = 'Gold';
 \end{minted}
 \end{frame}
 
+\begin{frame}[fragile]
+    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql} 
+CREATE TABLE test_index(
+    id int,
+    name varchar(100)
+);
+INSERT INTO test_index(id, name)
+    (SELECT generate_series(0, 1000000), 
+    gen_random_uuid());
+
+EXPLAIN ANALYZE SELECT * FROM test_index
+WHERE id between 100 and 500;
+
+CREATE INDEX id_idx ON test_index(id);
+    \end{minted}
+    
+
+\end{frame}
+
 \begin{frame}
     \frametitle{思考}
 假设1个page（4KB）能够容纳100个索引项，那么对于100,000,000条元组，需要使用1,000,000个page（即4GB）来保存索引。考虑到内存的限制，应该如何做？
