@@ -174,6 +174,8 @@
 {\setbeamercolor{palette primary}{fg=black, bg=yellow}
 \begin{frame}[standout]
     无损分解（lossless decomposition）是「好」的关系数据库设计的基础。
+    
+    \[\Pi_{R_1}(r) \Join  \Pi_{R_2}(r) = r\]
 \end{frame}
 }
 
@@ -261,7 +263,7 @@
 \begin{frame}
     \frametitle{平凡依赖}
 \begin{exampleblock}{平凡依赖}
-如果$\beta \in \alpha$，那么函数依赖$\alpha \rightarrow \beta$就是\alert{平凡的}（trivial）。    
+如果$\beta \subseteq \alpha$，那么函数依赖$\alpha \rightarrow \beta$就是\alert{平凡的}（trivial）。    
 \end{exampleblock}
 
 比如，
@@ -349,6 +351,20 @@
 
 \begin{frame}
     \frametitle{练习1}
+考虑关系模式$(A, B, C, D, E)$，并有函数依赖$A \rightarrow B$和$BC \rightarrow D$。假设分解得到：
+
+\begin{itemize}
+    \item (A, B)
+    \item (A, C, D, E)
+\end{itemize}
+
+请问分解后的两个模式是否满足BCNF？
+    
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{练习2}
 假设一个老师有多个地址，请对下面的关系模式进行分解，使其满足BCNF。
 
 \texttt{inst(ID, name, street, city)}
@@ -369,7 +385,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{练习2}
+    \frametitle{练习3}
 假设一个老师只能在一个学院，而一个学生可以在多个学院，请问下面的E-R图表示什么含义？关系模式\texttt{dept\_advisor}是否满足BCNF？
     
 \begin{tikzpicture}[
@@ -462,14 +478,10 @@
 \begin{exampleblock}{检查非平凡依赖是否违反BCNF}
     对于每个非平凡依赖$\alpha \rightarrow \beta$，计算属性集$\alpha$的闭包，验证它是否包含所有R的属性；如果是，表明它就是超码。    
 \end{exampleblock}
-  
-\pause 
-例子：考虑关系模式\texttt{R = (A, B, C, D, E)}，所包含函数依赖有：$A \rightarrow BC$，$CD \rightarrow E$，$B \rightarrow D$, $E \rightarrow A$。说明下面的分解满足BCNF：
+这样考虑依赖$F$即可，而不需要考虑其闭包$F^+$。
 
-\begin{itemize}
-    \item (A, B, C, E)
-    \item (B, D)
-\end{itemize}
+\pause 
+\faIcon{pen} 例子：考虑关系模式\texttt{R = (A, B, C, D, E)}，所包含函数依赖有：$A \rightarrow BC$，$CD \rightarrow E$，$B \rightarrow D$, $E \rightarrow A$。请问R是否符合BCNF？
 
 \end{frame}
 
@@ -488,7 +500,7 @@
     \scalebox{.8}{  
         \begin{algorithm}[H]
         \caption{BCNF decomposition}
-$result \gets {R}$ \\
+$result \gets \{R\}$ \\
 $done \gets false$ \\
 \While{not done}{
     \If{there is a schema $R_i$ that is not in BCNF}{
@@ -503,8 +515,16 @@ $done \gets false$ \\
 \end{frame}
 
 \begin{frame}
+    \frametitle{练习}
+
+    考虑关系模式\texttt{R = (A, B, C, D, E)}，所包含函数依赖有：$A \rightarrow BC$，$CD \rightarrow E$，$B \rightarrow D$, $E \rightarrow A$。请通过分解得到符合BCNF的模式。  
+
+\end{frame}
+
+\begin{frame}
     \section{\textcolor{darkmidnightblue}{小结}}
     \begin{itemize}
+        \item 模式分解
         \item 函数依赖
         \item BCNF, 3NF
     \end{itemize}

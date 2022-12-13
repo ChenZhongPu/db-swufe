@@ -181,7 +181,7 @@
 
 \begin{frame}
     \frametitle{1.1 文件存储}
-虽然DBMS是由传统的\alert{基于文件的处理系统}进化而来，但是DBMS还是需要使用文件来存储数据。只不过，它采用了一种自定义的格式（甚至OS也把不知道文件的内容）。
+虽然DBMS是由传统的\alert{基于文件的处理系统}进化而来，但是DBMS还是需要使用文件来存储数据。只不过，它采用了一种自定义的格式（甚至OS也一般不知道文件的内容）。
 
 DBMS将文件组织成一组\alert{pages}。
 
@@ -417,11 +417,11 @@ WHERE department = 'Music';
 
 \begin{frame}[fragile]
     \frametitle{练习}
-考虑关系\texttt{R(q\_id, txns, total, failed)}，所有属性都是定长且长度相同。假设R有20,000条元组，存储在100个pages中，并忽略page header等元数据。如果DBMS使用列存储，那么为了回答下面的查询：
+考虑关系\texttt{R(\underline{q\_id}, txns, total, failed)}，所有属性都是定长且长度相同。假设R有20,000条元组，恰好存储在100个pages中，并忽略page header等元数据。如果DBMS使用列存储，那么为了回答下面的查询：
 
 \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT total - failed FROM R
-WHERE q id = 96 AND txns > 420;
+WHERE q_id = 96 AND txns > 420;
 \end{minted}
     
 DBMS需要从磁盘最少读取多少个pages?
@@ -430,7 +430,7 @@ DBMS需要从磁盘最少读取多少个pages?
 
 \begin{frame}
     \section{\textcolor{darkmidnightblue}{2. 索引（index）}}
-
+    A database index is a data structure that improves the speed of data retrieval operations on a database table at the cost of additional writes and storage space to maintain the index data structure.
 \end{frame}
 
 \begin{frame}
@@ -651,6 +651,7 @@ B+树是平衡的，其高度的数量级是$\log{N}$；一个B+结点一般在�
     };
 \end{tikzpicture}
 
+\href{https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html}{可视化B+树}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -692,7 +693,7 @@ INSERT INTO test_index(id, name)
     gen_random_uuid());
 
 EXPLAIN ANALYZE SELECT * FROM test_index
-WHERE id between 100 and 500;
+WHERE id BETWEEN 100 AND 500;
 
 CREATE INDEX id_idx ON test_index(id);
     \end{minted}
@@ -709,6 +710,7 @@ CREATE INDEX id_idx ON test_index(id);
 
 \begin{frame}
     \section{\textcolor{darkmidnightblue}{3. 事务（transaction）}}
+The term \alert{transaction} refers to a collection of operations that form a single logical unit of work. 
     \begin{itemize}
         \item 原子性（atomicity）
         \item 一致性（consistency）
