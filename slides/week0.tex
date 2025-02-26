@@ -59,7 +59,7 @@
 }
 
 \date[] % (optional)
-{SWUFE, Fall 2022}
+{SWUFE, Spring \the\year{}}
 
 %End of title page configuration block
 %------------------------------------------------------------
@@ -93,180 +93,188 @@
 % \end{frame}
 %--------------------------------------------------------
 \begin{frame}
-    \frametitle{关于我：陈中普}
-    
-    \begin{block}{\faIcon{book} 研究方向}
-        时空数据库，大数据分析
-    \end{block}
-    
-    \begin{block}{\faIcon{building} 办公室}
-        通博楼B-422
-    \end{block}
-    
-    \begin{block}{\faIcon{home} 主页}
-        \href{https://zhongpu.info}{https://zhongpu.info}
-    \end{block}
-    
+	\frametitle{关于我：陈中普}
+
+	\begin{block}{\faIcon{book} 研究方向}
+		数据库，大语言模型
+	\end{block}
+
+	\begin{block}{\faIcon{building} 办公室}
+		格致楼J-310
+	\end{block}
+
+	\begin{block}{\faIcon{home} 主页}
+		\href{https://zhongpu.info}{https://zhongpu.info}
+	\end{block}
+
 \end{frame}
 
 {
-    % \usebackgroundtemplate{\transparent{0.3}{\begin{picture}
-    %     \includegraphics[height=0.7\paperheight]{cover}
-    % \end{picture}    
-    % }}
+% \usebackgroundtemplate{\transparent{0.3}{\begin{picture}
+%     \includegraphics[height=0.7\paperheight]{cover}
+% \end{picture}    
+% }}
 \usebackgroundtemplate{
-  \tikz[overlay,remember picture] 
-  \node[opacity=0.3, at=(current page.south east),anchor=south east, yshift=2cm,xshift=2cm] {
-    \includegraphics[height=0.6\paperheight]{cover}};
+	\tikz[overlay,remember picture]
+	\node[opacity=0.3, at=(current page.south east),anchor=south east, yshift=2cm,xshift=2cm] {
+		\includegraphics[height=0.6\paperheight]{cover}};
 }
-    \begin{frame}
-        \section{\textcolor{darkmidnightblue}{关于课程}}
-    \end{frame}
+\begin{frame}
+	\section{\textcolor{darkmidnightblue}{关于课程}}
+\end{frame}
 }
 
 \begin{frame}
-    \frametitle{关于课程}
-\begin{block}{数据库}
-    \alert{数据库}是计算机、软件工程、数据科学等专业的核心课程。
+	\frametitle{关于课程}
+	\begin{block}{数据库}
+		\alert{数据库}是计算机、软件工程、数据科学等专业的核心课程。
 
-它向上能支撑互联网、银行等不同行业的应用，向下能触及存储、查询优化、编译、分布式计算等计算机核心技术。
-\end{block}
-\grid{顶} \grid{天} \grid{立} \grid{地}
+		它向上能支撑互联网、银行等不同行业的应用，向下能触及存储、查询优化、编译、分布式计算等计算机核心技术。
+	\end{block}
+	\grid{顶} \grid{天} \grid{立} \grid{地}
 \end{frame}
 
 
 \begin{frame}
-    \frametitle{预备知识}    
-原则上几乎不需要预备知识，掌握\alert{阅读文档}（尤其是英文文档）和\alert{安装软件}的能力即可。
-\pause
-\begin{block}{重点}
-本课程是应用导向的，因此存储、查询优化、事务等技术几乎不涉及。重点是：
-\begin{itemize}
-    \item  如何使用数据库
-    \item  如何设计数据库
-\end{itemize}
-    
-\end{block}
+	\frametitle{预备知识}
+	原则上几乎不需要预备知识，掌握\alert{阅读文档}（尤其是英文文档）和\alert{安装软件}的能力即可。
+	\pause
+	\begin{block}{重点}
+		本课程是应用导向的，因此存储、查询优化、事务等技术几乎不涉及。重点是：
+		\begin{itemize}
+			\item  如何使用数据库
+			\item  如何设计数据库
+		\end{itemize}
+
+	\end{block}
 \end{frame}
 
 \begin{frame}[fragile]
-    \begin{center}
-        \includegraphics[height=.99\paperheight]{image/system}
-    \end{center}
+	\begin{center}
+		\includegraphics[height=.99\paperheight]{image/system}
+	\end{center}
 \end{frame}
 
 \begin{frame}
-    \frametitle{参考书籍}
-    \href{https://book.douban.com/subject/30345517/}{Database System Concepts}, 7th edition, by Abraham Silberschatz, Henry F Korth, and S Sudarshan.
-    \begin{center}
-        \includegraphics[height=.5\paperheight]{image/dsc-book}
-    \end{center}
+	\frametitle{参考书籍}
+	\href{https://book.douban.com/subject/30345517/}{Database System Concepts}, 7th edition, by Abraham Silberschatz, Henry F Korth, and S Sudarshan.
+	\begin{center}
+		\includegraphics[height=.5\paperheight]{image/dsc-book}
+	\end{center}
 \end{frame}
 
 \begin{frame}
-    \frametitle{非参考书籍}
-    \href{https://book.douban.com/subject/26317662/}{数据库系统概论}，第五版，by 王珊，萨师煊。
-    \begin{center}
-        \includegraphics[height=.5\paperheight]{image/book2}
-    \end{center}
+	\frametitle{非参考书籍}
+	\href{https://book.douban.com/subject/26317662/}{数据库系统概论}，第五版，by 王珊，萨师煊。
+	\begin{center}
+		\includegraphics[height=.5\paperheight]{image/book2}
+	\end{center}
 
 \end{frame}
 
 \begin{frame}
-    \frametitle{课程资源}
-    \begin{columns}
-        \column{0.475\textwidth} 
-        \begin{itemize}
-            \item 代码及作业@\href{https://github.com/ChenZhongPu/db-swufe}{GitHub}
-            \item Slides@\href{https://zhongpu.info/teaching/cs205-2022-fall/}{Zhongpu.info}
-            \item 作业提交@飞书 (\small 扫描后加入企业，点击\alert{「切换企业」}，再扫描一次)
-        \end{itemize}
-        \column{0.475\textwidth} 
-        \includegraphics[height=0.85\paperheight]{image/feishu}
-    \end{columns}
+	\frametitle{评价标准}
+
+	\begin{tikzpicture}
+		\colorlet{good}{green!75!black}
+		\colorlet{bad}{red}
+		\colorlet{neutral}{black!60}
+		\colorlet{none}{blue!75!black}
+
+		\node[align=center,text width=3cm]{考核};
+
+		\begin{scope}[line width=4mm,rotate=270]
+			\draw[good]          (180:2cm) arc (180:360:2cm);
+			\draw[bad]  (0:2cm)  arc (0:108:2cm);
+			\draw[none] (108:2cm) arc (108:180:2cm);
+
+			\newcount\mycount
+			\foreach \angle in {0,72,...,3599}
+				{
+					\mycount=\angle\relax
+					\divide\mycount by 10\relax
+					\draw[black!15,thick] (\the\mycount:18mm) -- (\the\mycount:22mm);
+				}
+
+			\draw (-90:2.2cm) node[left] {作业 (50\%)};
+			\draw (65:2.2cm) node[right] {期末 (30\%)};
+			\draw (130:2.2cm) node[right] {Project (20\%)};
+		\end{scope}
+	\end{tikzpicture}
+	\begin{tikzpicture}
+		\node[fill=red!80, text=white, blur shadow={shadow xshift=-0.5ex},
+			text width=8em,anchor=south west,rounded corners, ]
+		{严禁抄袭！
+		};
+	\end{tikzpicture}
+	其中，Project成绩暂定是学生自行评定。
+\end{frame}
+\begin{frame}
+	\frametitle{软件工具}
+	PostgreSQL 17: \emph{The World's Most Advanced Open Source Relational Database}
+
+	\includegraphics[width=.9\paperwidth]{image/pg-home}
 \end{frame}
 
 \begin{frame}
-    \frametitle{评价标准}
-    
-    \begin{tikzpicture}
-        \colorlet{good}{green!75!black}
-        \colorlet{bad}{red}
-        \colorlet{neutral}{black!60}
-        \colorlet{none}{blue!75!black}
-      
-        \node[align=center,text width=3cm]{考核};
-      
-        \begin{scope}[line width=4mm,rotate=270]
-          \draw[good]          (180:2cm) arc (180:324:2cm);
-          \draw[neutral]       (-36:2cm) arc (-36:0:2cm);
-          \draw[bad]  (0:2cm)  arc (0:108:2cm);
-          \draw[none] (108:2cm) arc (108:180:2cm);
-      
-          \newcount\mycount
-          \foreach \angle in {0,72,...,3599}
-          {
-            \mycount=\angle\relax
-            \divide\mycount by 10\relax
-            \draw[black!15,thick] (\the\mycount:18mm) -- (\the\mycount:22mm);
-          }
-      
-          \draw (0:2.2cm) node[below] {平时表现 (10\%)};
-          \draw (-90:2.2cm) node[left] {作业 (40\%)};
-          \draw (65:2.2cm) node[right] {期末考试 (30\%)};
-          \draw (130:2.2cm) node[right] {Project (20\%)};
-        \end{scope}
-        % \draw[gray] (0,0) circle (2.2cm) circle (1.8cm);
-      \end{tikzpicture}
-      \begin{tikzpicture}
-        \node[fill=red!80, text=white, blur shadow={shadow xshift=-0.5ex},
-        text width=8em,anchor=south west,rounded corners, ]
-        {严禁抄袭！
-        };
-      \end{tikzpicture}
-\end{frame}
-\begin{frame}
-    \frametitle{软件工具}    
-    PostgreSQL 14: \emph{The World's Most Advanced Open Source Relational Database}
+	\href{https://db-engines.com/en/ranking}{DB-Engines Ranking}
 
-    \includegraphics[width=.9\paperwidth]{image/pg-home}
+	\begin{table}
+		\caption{DB Rank}
+		\begin{tabular}{lll}
+			\toprule
+			Rank & DBMS                         & Database Model \\
+			\midrule
+			1    & \textcolor{blue}{Oracle}     & Relational     \\
+			2    & \textcolor{blue}{MySQL}      & Relational     \\
+			3    & \textcolor{blue}{SQL Server} & Relational     \\
+			4    & \textcolor{blue}{PostgreSQL} & Relational     \\
+			5    & \textcolor{blue}{MongoDB}    & Document       \\
+			6    & \textcolor{blue}{Redis}      & Key value      \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
 \end{frame}
 
 \begin{frame}
-\href{https://db-engines.com/en/ranking}{DB-Engines Ranking} 
-
-\begin{table}
-    \caption{DB Rank}
-    \begin{tabular}{lll}
-      \toprule
-      Rank & DBMS & Database Model \\
-      \midrule
-      1 & \textcolor{blue}{Oracle} & Relational \\
-      2 & \textcolor{blue}{MySQL} & Relational \\
-      3 & \textcolor{blue}{SQL Server} & Relational \\
-      4 & \textcolor{blue}{PostgreSQL} & Relational \\
-      5 & \textcolor{blue}{MongoDB} & Document \\
-      6 & \textcolor{blue}{Redis} & Key value \\
-      \bottomrule
-    \end{tabular}
-\end{table}
+	\includegraphics[width=.9\paperwidth]{image/pg-mysql1}
+	\begin{itemize}
+		\item 会什么选什么。PG 功能强大，但是我只会玩 MySQL 所以我用 MySQL 。
+		\item 选 mysql，用 pg 的人一般不会有这个疑问。
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
-    \includegraphics[width=.9\paperwidth]{image/pg-mysql1}
-    \begin{itemize}
-        \item 会什么选什么。PG 功能强大，但是我只会玩 MySQL 所以我用 MySQL 。
-        \item 选 mysql，用 pg 的人一般不会有这个疑问。
-    \end{itemize}
+	\frametitle{软件工具}
+	\href{https://www.jetbrains.com/datagrip/}{DataGrip}，Navicat，pgAdmin，...
+
+	\begin{center}
+		\includegraphics[width=.55\paperwidth]{image/datagrip}
+	\end{center}
+
+\end{frame}
+\begin{frame}
+	\frametitle{AI时代下的基础数据库教学}
+
+	\begin{columns}
+		\column{0.6\textwidth}
+		\begin{center}
+			\includegraphics[width=.5\paperwidth]{image/text2sql}
+		\end{center}
+		\column{0.4\textwidth}
+		ChatGPT、DeekSeek和Claude等大模型的Text2SQL能力足够应付非高阶任务。
+	\end{columns}
+
+
+	{\tiny Li, Boyan, et al. "The Dawn of Natural Language to SQL: Are We Fully Ready?." Proceedings of the VLDB Endowment 17.11 (2024): 3318-3331.}
 \end{frame}
 
 \begin{frame}
-    \frametitle{软件工具}    
-\href{https://www.jetbrains.com/datagrip/}{DataGrip}，Navicat，pgAdmin，...
+	\begin{center}
+		\includegraphics[width=.7\paperwidth]{image/chatgpt}
+	\end{center}
 
-\begin{center}
-    \includegraphics[width=.55\paperwidth]{image/datagrip}
-\end{center}
+	{\tiny \href{https://chatgpt.com/share/67bef99e-70e8-8010-abe7-6732a19093c4}{ChatGPT}}
 
 \end{frame}
 \end{document}
