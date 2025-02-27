@@ -184,9 +184,9 @@
 		\node[align=center,text width=3cm]{考核};
 
 		\begin{scope}[line width=4mm,rotate=270]
-			\draw[good]          (180:2cm) arc (180:360:2cm);
+			\draw[good]          (216:2cm) arc (216:360:2cm);
 			\draw[bad]  (0:2cm)  arc (0:108:2cm);
-			\draw[none] (108:2cm) arc (108:180:2cm);
+			\draw[none] (108:2cm) arc (108:216:2cm);
 
 			\newcount\mycount
 			\foreach \angle in {0,72,...,3599}
@@ -196,9 +196,9 @@
 					\draw[black!15,thick] (\the\mycount:18mm) -- (\the\mycount:22mm);
 				}
 
-			\draw (-90:2.2cm) node[left] {作业 (50\%)};
-			\draw (65:2.2cm) node[right] {期末 (30\%)};
-			\draw (130:2.2cm) node[right] {Project (20\%)};
+			\draw (-90:2.2cm) node[left] {期末Project (40\%)};
+			\draw (65:2.2cm) node[right] {作业 (30\%)};
+			\draw (130:2.2cm) node[right] {期末测试 (30\%)};
 		\end{scope}
 	\end{tikzpicture}
 	\begin{tikzpicture}
