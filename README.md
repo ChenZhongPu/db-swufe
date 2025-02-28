@@ -2,7 +2,7 @@
 
 Codes and exercises for the Database course at SWUFE.
 
-The textbook is [Database System Concepts](https://www.db-book.com/db7/).
+The textbook is [Database System Concepts](https://www.db-book.com/).
 
 ## Main Tools
 
