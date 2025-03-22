@@ -16,3 +16,10 @@ As for database management tools, other alternatives:
 - Navicat (_one year free for edu users_)
 - DBeaver (_free_)
 - HediSQL (_free_)
+
+## Online Demo
+
+To facilitate the learning, I deployed an online-demo for `SELECT` queries at [here](https://pg-sql-web.pages.dev/). Both application back-end and front-end are open-sourced.
+
+- [server](https://github.com/ChenZhongPu/pg-sql-select)
+- [web](https://github.com/ChenZhongPu/pg-sql-web)
