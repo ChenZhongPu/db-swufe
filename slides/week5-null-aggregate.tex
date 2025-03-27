@@ -711,12 +711,12 @@ GROUP BY x HAVING y > 3;
 -- 不推荐。having 子句一般使用聚集函数！
 SELECT x, sum(y) FROM test1 
 GROUP BY x 
-HAVING x > 3;
+HAVING x > 'a';
 
 -- 性能更好
 SELECT x, sum(y) FROM test1 
-GROUP BY x 
-WHERE x > 3;
+WHERE x > 'a'
+GROUP BY x;
     \end{minted}
 
 
