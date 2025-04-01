@@ -13,6 +13,7 @@ The textbook is [Database System Concepts](https://www.db-book.com/).
 
 As for database management tools, other alternatives:
 
+- Beekeeper Studio (community version is _free_)
 - Navicat (_one year free for edu users_)
 - DBeaver (_free_)
 - HediSQL (_free_)
