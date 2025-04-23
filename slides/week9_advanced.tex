@@ -47,7 +47,7 @@
 }
 
 \date[] % (optional)
-{SWUFE, Fall 2022}
+{SWUFE, Spring \the\year{}}
 
 %End of title page configuration block
 %------------------------------------------------------------
@@ -82,71 +82,71 @@
 %--------------------------------------------------------
 
 \begin{frame}
-    \frametitle{复习}
-    \begin{itemize}
-        \item 高级数据类型（时间和日期）
-        \item 类型转化
-        \item 授权
-    \end{itemize}
+	\frametitle{复习}
+	\begin{itemize}
+		\item 高级数据类型（时间和日期）
+		\item 类型转化
+		\item 授权
+	\end{itemize}
 
 \end{frame}
 \begin{frame}
-    \frametitle{小测试}
-给定某商场2021年的销售关系\texttt{sale2021(id, product\_id, time, price, unit)}：
-\begin{itemize}
-    \item 求出该商场2021年的总销售额。
-    \item 求出该商场销量前5的产品。
-    \item 找到销量最高的月份。
-\end{itemize}
-\begin{table}
-    \begin{tabular}{lllll}
-      \toprule
-      id & product\_id & time & price & unit \\
-      \midrule
-      1 & A1 & 2021-01-01 12:01:00 & 0.3 & 10 \\
-      2 & B2 & 2021-01-01 13:00:00 & 2.7 & 1 \\
-      \bottomrule
-    \end{tabular}
-\end{table}
+	\frametitle{小测试}
+	给定某商场2021年的销售关系\texttt{sale2021(id, product\_id, time, price, unit)}：
+	\begin{itemize}
+		\item 求出该商场2021年的总销售额。
+		\item 求出该商场销量前5的产品。
+		\item 找到销量最高的月份。
+	\end{itemize}
+	\begin{table}
+		\begin{tabular}{lllll}
+			\toprule
+			id & product\_id & time                & price & unit \\
+			\midrule
+			1  & A1          & 2021-01-01 12:01:00 & 0.3   & 10   \\
+			2  & B2          & 2021-01-01 13:00:00 & 2.7   & 1    \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
 \end{frame}
 
 {
-    % \usebackgroundtemplate{\transparent{0.3}{\begin{picture}
-    %     \includegraphics[height=0.7\paperheight]{cover}
-    % \end{picture}    
-    % }}
+% \usebackgroundtemplate{\transparent{0.3}{\begin{picture}
+%     \includegraphics[height=0.7\paperheight]{cover}
+% \end{picture}    
+% }}
 \usebackgroundtemplate{
-  \tikz[overlay,remember picture] 
-  \node[opacity=0.3, at=(current page.south east),anchor=south east, yshift=2cm,xshift=4cm] {
-    \includegraphics[height=0.6\paperheight]{cover}};
+	\tikz[overlay,remember picture]
+	\node[opacity=0.3, at=(current page.south east),anchor=south east, yshift=2cm,xshift=4cm] {
+		\includegraphics[height=0.6\paperheight]{cover}};
 }
-    \begin{frame}
-        \section{\textcolor{darkmidnightblue}{1. 函数与过程}}
-        Functions and procedures
-    \end{frame}
+\begin{frame}
+	\section{\textcolor{darkmidnightblue}{1. 函数与过程}}
+	Functions and procedures
+\end{frame}
 
 }
 
 \begin{frame}[fragile]
-    \frametitle{Functions}
+	\frametitle{Functions}
 
-    \begin{columns}
-        \column{.4\textwidth}
-        \begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+	\begin{columns}
+		\column{.4\textwidth}
+		\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
 def add(i, j):
     return i + j
     \end{minted}
-        \column{.6\textwidth}
-    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{java}
+		\column{.6\textwidth}
+		\begin{minted}[bgcolor=LightGray, baselinestretch=1]{java}
 public int add(int i, int j) {
     return i + j;
 }
-     \end{minted} 
+     \end{minted}
 
-    \end{columns}
+	\end{columns}
 
 
-    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT AVG(salary)
 FROM instructor
 GROUP BY length(name);
@@ -155,9 +155,9 @@ GROUP BY length(name);
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{1.1 定义函数}
+	\frametitle{1.1 定义函数}
 
-    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT add(1, 2);
 
 CREATE FUNCTION
@@ -166,16 +166,16 @@ AS 'select $1 + $2;'
 LANGUAGE SQL;
     \end{minted}
 
-可以在DataGrip左侧的的\texttt{「public」}$\rightarrow$\alert{\texttt{「routines」}}看到自定义的函数。
+	可以在DataGrip左侧的的\texttt{「public」}$\rightarrow$\alert{\texttt{「routines」}}看到自定义的函数。
 
-\faIcon{lightbulb}思考：如何删除自定义的函数？
+	\faIcon{lightbulb}思考：如何删除自定义的函数？
 \end{frame}
 
 
 \begin{frame}[fragile]
-也可以使用\alert{\texttt{\$\$}}，而不使用单引号，并且也可以给参数取名，甚至写成类似函数的形式：
+	也可以使用\alert{\texttt{\$\$}}，而不使用单引号，并且也可以给参数取名，甚至写成类似函数的形式：
 
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 CREATE FUNCTION multiply(i integer, j integer)
 RETURNS integer AS
 $$
@@ -189,14 +189,14 @@ LANGUAGE plpgsql;
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{例子}
-找到教师数大于12的所有学院的名称和预算。
+	\frametitle{例子}
+	找到教师数大于12的所有学院的名称和预算。
 
-\pause
+	\pause
 
-假设有一个函数\alert{\texttt{deptCount()}}，可以返回给定学院的教师数：
+	假设有一个函数\alert{\texttt{deptCount()}}，可以返回给定学院的教师数：
 
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT dept_name, budget
 FROM department
 WHERE deptCount(dept_name) > 12;
@@ -204,7 +204,7 @@ WHERE deptCount(dept_name) > 12;
 \end{frame}
 
 \begin{frame}[fragile]
-    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 CREATE FUNCTION deptCount(varchar(20))
 RETURNS integer as
     $$
@@ -218,13 +218,13 @@ RETURNS integer as
     $$ LANGUAGE plpgsql;
     \end{minted}
 
-\faIcon{search} 查阅资料，理解\texttt{SELECT INTO}的语法。
+	\faIcon{search} 查阅资料，理解\texttt{SELECT INTO}的语法。
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{1.2 定义过程}
+	\frametitle{1.2 定义过程}
 
-    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 CREATE PROCEDURE add2(integer, integer)
 AS
 $$
@@ -232,14 +232,14 @@ SELECT $1 + $2;
 $$ LANGUAGE SQL;
     \end{minted}
 
-\faIcon{code} 定义上面的过程后，试着运行\texttt{SELECT add2(1, 2)}，你有什么发现？
+	\faIcon{code} 定义上面的过程后，试着运行\texttt{SELECT add2(1, 2)}，你有什么发现？
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{使用「过程」的场景}
-现实世界中一个动作往往涉及到数据库的多次读写。比如，在淘宝下单时，数据库需要1）添加订单；２）添加配送信息。
-    
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\frametitle{使用「过程」的场景}
+	现实世界中一个动作往往涉及到数据库的多次读写。比如，在淘宝下单时，数据库需要1）添加订单；２）添加配送信息。
+
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 CREATE PROCEDURE 
     buy(id varchar(50), product text, address text)
 AS $$
@@ -252,140 +252,140 @@ LANGUAGE SQL;
 \end{frame}
 
 \begin{frame}
-    \frametitle{练习}
-西财的信息中心拟开发一个数据库过程\texttt{welcomeToCS()}，使得在录入计算机系的新生基本信息的同时，自动完成当年秋季学期CS-101课程（课程段为1）的选课。
+	\frametitle{练习}
+	西财的信息中心拟开发一个数据库过程\texttt{welcomeToCS()}，使得在录入计算机系的新生基本信息的同时，自动完成当年秋季学期CS-101课程（课程段为1）的选课。
 
-请实现上述需求。（参数包括学号和姓名）
+	请实现上述需求。（参数包括学号和姓名）
 
 \end{frame}
 
 {\setbeamercolor{palette primary}{fg=black, bg=yellow}
 \begin{frame}[standout]
-    函数（function）返回结果，而过程（procedure）主要用来执行一些操作。
+	函数（function）返回结果，而过程（procedure）主要用来执行一些操作。
 
-    {\small \faIcon{fire} 注意：各个DBMS的具体语法与标准SQL差异较大。}
+	{\small \faIcon{fire} 注意：各个DBMS的具体语法与标准SQL差异较大。}
 \end{frame}
 }
 
 \begin{frame}[fragile]
-    \section{\textcolor{darkmidnightblue}{2. 触发器 (trigger)}}
-    A \alert{trigger} is a statement that the system executes automatically as a side effect of a modification to the database.
+	\section{\textcolor{darkmidnightblue}{2. 触发器 (trigger)}}
+	A \alert{trigger} is a statement that the system executes automatically as a side effect of a modification to the database.
 \end{frame}
 
 \begin{frame}
-    \frametitle{触发器}
-To define a trigger, we must:
+	\frametitle{触发器}
+	To define a trigger, we must:
 
-\begin{itemize}
-    \item Specify when a trigger is to be executed. This is broken up into an \textbf{event} that causes the trigger to be checked and a \textbf{condition} that must be satisfied for trigger execution to proceed.
-    \item Specify the \textbf{actions} to be taken when the trigger executes.
-\end{itemize}
+	\begin{itemize}
+		\item Specify when a trigger is to be executed. This is broken up into an \textbf{event} that causes the trigger to be checked and a \textbf{condition} that must be satisfied for trigger execution to proceed.
+		\item Specify the \textbf{actions} to be taken when the trigger executes.
+	\end{itemize}
 
-\faIcon{bell} 比如，当学生某门课及格后（\texttt{takes}），需要自动增加她所修的总学分（\texttt{student}）。
+	\faIcon{bell} 比如，当学生某门课及格后（\texttt{takes}），需要自动增加她所修的总学分（\texttt{student}）。
 \end{frame}
 
 \begin{frame}[fragile]
-    \section{\textcolor{darkmidnightblue}{3. 使用程序语言访问数据库}}
-\begin{center}
-    {\Huge \faIcon{java} \faIcon{python} \faIcon{rust} \faIcon{php}}
+	\section{\textcolor{darkmidnightblue}{3. 使用程序语言访问数据库}}
+	\begin{center}
+		{\Huge \faIcon{java} \faIcon{python} \faIcon{rust} \faIcon{php}}
 
-{\Huge \faIcon{arrows-alt-v}}
+		{\Huge \faIcon{arrows-alt-v}}
 
-{\Huge \faIcon{database}}
-\end{center}
-
-\end{frame}
-
-\begin{frame}
-    \frametitle{3.1 背景知识}
-\begin{exampleblock}{B-S构架}
-    DBMS是经典的B-S构架。我们使用的SQL Shell或是DataGrip、Navicat等软件仅仅是个客户端。
-\end{exampleblock}
-
-类似的，使用编程语言（如Python、Java等）编写的程序也可以作为客户端与DBMS进行交互。
-
-\faIcon{eye} \textbf{小任务}：在DBGrip的左侧，在\texttt{mydb@localhost}上右键，点击「Properties」，你看到是URL是什么？你觉得需要什么信息才能唯一地标识一个数据库？
+		{\Huge \faIcon{database}}
+	\end{center}
 
 \end{frame}
 
 \begin{frame}
+	\frametitle{3.1 背景知识}
+	\begin{exampleblock}{B-S构架}
+		DBMS是经典的B-S构架。我们使用的SQL Shell或是DataGrip、Navicat等软件仅仅是个客户端。
+	\end{exampleblock}
 
-    https://github.com/ChenZhongPu
+	类似的，使用编程语言（如Python、Java等）编写的程序也可以作为客户端与DBMS进行交互。
 
-    \begin{tikzpicture}[every node/.style={scale=1.3}]
-        \node[red](proxy){jdbc:postgresql};
-        \node(t1)[right=of proxy,xshift=-1cm]{://};
-        \node[blue, right=of t1, xshift=-1cm](server){localhost};
-        \node(t2)[right=of server,xshift=-1cm]{:};
-        \node(port)[olive,right=of t2, xshift=-1cm]{5432};
-        \node(t3)[right=of port, xshift=-1cm]{/};
-        \node(db)[right=of t3, xshift=-1cm, violet]{mydb};
+	\faIcon{eye} \textbf{小任务}：在DBGrip的左侧，在\texttt{mydb@localhost}上右键，点击「Properties」，你看到是URL是什么？你觉得需要什么信息才能唯一地标识一个数据库？
 
-        \node(proxyt)[above=of proxy]{协议};
-        \draw[->, thick](proxyt) -- (proxy);
-
-        \node(servert)[above=of server]{服务器};
-        \draw[->, thick](servert) -- (server);
-        
-        \node(portt)[above=of port]{端口};
-        \draw[->, thick](portt) -- (port);
-    \end{tikzpicture}
-
-当然，访问数据库的时候还需要用户名和密码。
 \end{frame}
 
 \begin{frame}
-    \frametitle{3.2 连接SQL的标准}
-\begin{itemize}
-    \item JDBC
-    \item ODBC
-\end{itemize}
-实现上述标准的程序一般称为数据库驱动（driver或connector），它们的作用是将程序中的SQL发送给DBMS，再将DBMS的执行结果返回给程序。
 
-\begin{tikzpicture}
-    \node[fill=yellow,blur shadow={shadow xshift=-0.5ex},
-    text width=16em,anchor=south west,rounded corners]
-    {不同DBMS的驱动是不同的。};
-\end{tikzpicture} 
+	https://github.com/ChenZhongPu
+
+	\begin{tikzpicture}[every node/.style={scale=1.3}]
+		\node[red](proxy){jdbc:postgresql};
+		\node(t1)[right=of proxy,xshift=-1cm]{://};
+		\node[blue, right=of t1, xshift=-1cm](server){localhost};
+		\node(t2)[right=of server,xshift=-1cm]{:};
+		\node(port)[olive,right=of t2, xshift=-1cm]{5432};
+		\node(t3)[right=of port, xshift=-1cm]{/};
+		\node(db)[right=of t3, xshift=-1cm, violet]{mydb};
+
+		\node(proxyt)[above=of proxy]{协议};
+		\draw[->, thick](proxyt) -- (proxy);
+
+		\node(servert)[above=of server]{服务器};
+		\draw[->, thick](servert) -- (server);
+
+		\node(portt)[above=of port]{端口};
+		\draw[->, thick](portt) -- (port);
+	\end{tikzpicture}
+
+	当然，访问数据库的时候还需要用户名和密码。
+\end{frame}
+
+\begin{frame}
+	\frametitle{3.2 连接SQL的标准}
+	\begin{itemize}
+		\item JDBC
+		\item ODBC
+	\end{itemize}
+	实现上述标准的程序一般称为数据库驱动（driver或connector），它们的作用是将程序中的SQL发送给DBMS，再将DBMS的执行结果返回给程序。
+
+	\begin{tikzpicture}
+		\node[fill=yellow,blur shadow={shadow xshift=-0.5ex},
+			text width=16em,anchor=south west,rounded corners]
+		{不同DBMS的驱动是不同的。};
+	\end{tikzpicture}
 
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{3.3 Python访问数据库}
-    Python中访问PostgreSQL常用的驱动是\alert{\texttt{psycopg2}}。
-    
-\begin{verbatim}
+	\frametitle{3.3 Python访问数据库}
+	Python中访问PostgreSQL常用的驱动是\alert{\texttt{psycopg2}}。
+
+	\begin{verbatim}
 pip3 install psycopg2
 python3 main.py 
 \end{verbatim}
 
-\faIcon{code}\textbf{小任务}:阅读\href{https://github.com/ChenZhongPu/db-swufe/blob/master/10_advanced/python-demo/main.py}{main.py}，并试着完成\texttt{delete()}功能。
+	\faIcon{code}\textbf{小任务}:阅读\href{https://github.com/ChenZhongPu/db-swufe/blob/master/10_advanced/python-demo/main.py}{main.py}，并试着完成\texttt{delete()}功能。
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{3.4 ORM}
-但是，直接在程序里面嵌入SQL代码对于大型项目是个噩梦。
+	\frametitle{3.4 ORM}
+	但是，直接在程序里面嵌入SQL代码对于大型项目是个噩梦。
 
-\begin{itemize}
-    \item SQL代码无法在编译时验证是否正确
-    \item 无法屏蔽不同DBMS的差异
-\end{itemize}
+	\begin{itemize}
+		\item SQL代码无法在编译时验证是否正确
+		\item 无法屏蔽不同DBMS的差异
+	\end{itemize}
 
 
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
 cur.execute("SELECT * FROM department")
 # Retrieve query results
 records = cur.fetchall()
 \end{minted}
 
-为了解决这些问题，object-relational mapping被广泛应用。
+	为了解决这些问题，object-relational mapping被广泛应用。
 \end{frame}
 
 \begin{frame}[fragile]
-Python中最流行的ORM框架是\href{https://www.sqlalchemy.org/}{SQLAlchemy}。
+	Python中最流行的ORM框架是\href{https://www.sqlalchemy.org/}{SQLAlchemy}。
 
 
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
 dept = session.query(Department)
               .filter_by(building='Watson')
               .first()
@@ -394,18 +394,18 @@ depts = session.query(Department)
                .filter(Department.dept_name.like('%s'))
 \end{minted}
 
-课下有兴趣可以阅读\href{https://github.com/ChenZhongPu/db-swufe/blob/master/10_advanced/python-orm/main-orm.py}{main-orm.py}。
+	课下有兴趣可以阅读\href{https://github.com/ChenZhongPu/db-swufe/blob/master/10_advanced/python-orm/main-orm.py}{main-orm.py}。
 \end{frame}
 
 \begin{frame}[fragile]
-    \section{\textcolor{darkmidnightblue}{4. SQL注入攻击（SQL Injection）}}
-    （恶意的）SQL语句插入了特殊的字符串，服务器执行后造成了意想不到的效果。
+	\section{\textcolor{darkmidnightblue}{4. SQL注入攻击（SQL Injection）}}
+	（恶意的）SQL语句插入了特殊的字符串，服务器执行后造成了意想不到的效果。
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{预备知识}
+	\frametitle{预备知识}
 
-    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT 1 = '1';
 
 SELECT 1 = '1'::text;
@@ -413,21 +413,21 @@ SELECT 1 = '1'::text;
 SELECT * FROM instructor
 WHERE ID = ;
     \end{minted}
-\faIcon{lightbulb} \textbf{思考}：上面的SQL语句中在\texttt{ID = }后面填入什么信息能够保证一定有结果？
+	\faIcon{lightbulb} \textbf{思考}：上面的SQL语句中在\texttt{ID = }后面填入什么信息能够保证一定有结果？
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{回顾}
-\begin{exampleblock}{Homework 1}
-假设数据库中存储用户名和密码的关系模式是\texttt{users(name, pswd, gender)}，请结合关系代数简述实现用户登录的思路。
-\end{exampleblock}
+	\frametitle{回顾}
+	\begin{exampleblock}{Homework 1}
+		假设数据库中存储用户名和密码的关系模式是\texttt{users(name, pswd, gender)}，请结合关系代数简述实现用户登录的思路。
+	\end{exampleblock}
 
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
 sql = f"SELECT * FROM users WHERE name = '{name}'
         AND pswd = '{pswd}'"
 \end{minted}
 
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT *
 FROM users
 WHERE name='zhongpu' AND pswd='123abc';
@@ -436,33 +436,33 @@ WHERE name='zhongpu' AND pswd='123abc';
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{登录SQL}
+	\frametitle{登录SQL}
 
-    \begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{python}
 name = "zhongpu"
 pswd = "' or '1'='1"
 sql = f"SELECT * FROM users WHERE name='{name}'
         AND pswd='{pswd}'"
-    \end{minted}  
+    \end{minted}
 
-\faIcon{code} 上面的字符串拼接的结果是什么？并试着运行改SQL语句。
+	\faIcon{code} 上面的字符串拼接的结果是什么？并试着运行改SQL语句。
 \end{frame}
 
 \begin{frame}[fragile]
 
-如果密码是\alert{\texttt{' or '1'='1}}，SQL语句为：
+	如果密码是\alert{\texttt{' or '1'='1}}，SQL语句为：
 
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT * 
 FROM users 
 WHERE name='zhongpu' 
 AND pswd='' or '1'='1';
 \end{minted}
 
-\pause
-如果密码是\alert{\texttt{' or 1='1}}，SQL语句为：
+	\pause
+	如果密码是\alert{\texttt{' or 1='1}}，SQL语句为：
 
-\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
 SELECT *
 FROM users
 WHERE name='zhongpu'
@@ -472,38 +472,38 @@ AND pswd='' or 1='1';
 \end{frame}
 
 \begin{frame}
-\href{https://www.youtube.com/watch?v=wcaiKgQU6VE}{What Is SQL Injection?@YouTube}
-    
+	\href{https://www.youtube.com/watch?v=wcaiKgQU6VE}{What Is SQL Injection?@YouTube}
+
 
 \end{frame}
 
 {\setbeamercolor{palette primary}{fg=black, bg=yellow}
 \begin{frame}[standout]
-使用简单的字符串拼接构造的SQL语句有SQL注入的风险！
+	使用简单的字符串拼接构造的SQL语句有SQL注入的风险！
 
-可以使用ORM或PreparedStatement避免这个问题。
+	可以使用ORM或PreparedStatement避免这个问题。
 \end{frame}
 }
 
 
 \begin{frame}[fragile]
-    \section{\textcolor{darkmidnightblue}{总结}}
+	\section{\textcolor{darkmidnightblue}{总结}}
 
-\begin{itemize}
-    \item 函数与过程
-    \item 动态SQL
-    \item SQL注入
-\end{itemize}
+	\begin{itemize}
+		\item 函数与过程
+		\item 动态SQL
+		\item SQL注入
+	\end{itemize}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Homework 6}
-要求对关键步骤进行截图。
-    \begin{itemize}
-        \item （关系数据库）自行安装MySQL、Oracle或者MS SQL Server，并通过DataGrip导入大学数据库中的数据，进行基本操作。（9分）
-        \item （非关系数据库）自行安装Redis或者MongoDB，并自拟数据，完成基本操作。(1分)
-    \end{itemize}
-
-\end{frame}
+% \begin{frame}
+% 	\frametitle{Homework 6}
+% 	要求对关键步骤进行截图。
+% 	\begin{itemize}
+% 		\item （关系数据库）自行安装MySQL、Oracle或者MS SQL Server，并通过DataGrip导入大学数据库中的数据，进行基本操作。（9分）
+% 		\item （非关系数据库）自行安装Redis或者MongoDB，并自拟数据，完成基本操作。(1分)
+% 	\end{itemize}
+%
+% \end{frame}
 
 \end{document}
