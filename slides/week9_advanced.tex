@@ -92,7 +92,7 @@
 \end{frame}
 \begin{frame}
 	\frametitle{小测试}
-	给定某商场2024年的销售关系\texttt{sale2024(id, product\_id, time, price, unit)}：
+	给定某商场的销售关系\texttt{sale(id, product\_id, time, price, unit)}：
 	\begin{itemize}
 		\item 求出该商场2024年的总销售额。
 		\item 求出该商场销量前5的产品。
@@ -104,10 +104,21 @@
 			id & product\_id & time                & price & unit \\
 			\midrule
 			1  & A1          & 2024-01-01 12:01:00 & 0.3   & 10   \\
-			2  & B2          & 2024-01-01 13:00:00 & 2.7   & 1    \\
+			2  & B2          & 2025-01-01 13:00:00 & 2.7   & 1    \\
 			\bottomrule
 		\end{tabular}
 	\end{table}
+\end{frame}
+
+\begin{frame}
+	\frametitle{小测试}
+	给定某商场的销售关系\texttt{sale(id, product\_id, time, price, unit}, 以及产品关系\texttt{product(id, name, category, cost\_price)}。
+
+	\begin{itemize}
+		\item 获得有销售记录的产品的ID和名称
+		\item 获得所有产品的销量，包括没有销售记录的产品
+		\item 获得所有产品的名称、总销售额、总利润
+	\end{itemize}
 \end{frame}
 
 {
