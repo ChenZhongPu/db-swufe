@@ -51,7 +51,7 @@
 }
 
 \date[] % (optional)
-{SWUFE, Fall 2022}
+{SWUFE, Spring \the\year{}}
 
 %End of title page configuration block
 %------------------------------------------------------------
@@ -165,43 +165,43 @@
 
 \end{frame}
 
-\begin{frame}
-    \frametitle{思考}
-
-\begin{columns}
-    \column{.5\textwidth}
-    数据库设计并运行后，修改 \rule{1cm}{0.15mm} 相对比较简单。
-
-\begin{itemize}
-    \item 逻辑模式
-    \item 物理模式
-\end{itemize}
-    \column{.5\textwidth}
-    \begin{tikzpicture}[
-        node distance=2cm,
-        title/.style={font=\color{black!50}\ttfamily, fill=orange!30,},
-        typetag/.style={rectangle, draw=black!50, font=\ttfamily, anchor=west}
-      ]
-        \node (decomp) [title] { \normalsize 视图层 (view level)};
-      
-        \node (di) [below=of decomp.west, typetag, yshift=0.5cm] { view 1 };
-        \node (dr) [right=of di.west, typetag] { view 2 };
-        \node (dots) [right=of dr.west] {...};
-        \node (dnc) [right=of dots.west, typetag, xshift=-1cm] { view n };
-      
-        \node [draw=black!50,  fit={(decomp) (di) (dr) (dots) (dnc)}] (view){};
-    
-        \node[draw=black!50, below=of view, yshift=1cm,title](logical){逻辑层 (logical level)};
-    
-        \node[draw=black!50, below=of logical, yshift=1cm,title](physical){物理层 (physical level)}; 
-    
-        \draw[-, thick] (view) -- (logical);
-        \draw[-, thick] (logical) -- (physical);
-    
-      \end{tikzpicture}
-\end{columns}
-
-\end{frame}
+% \begin{frame}
+%     \frametitle{思考}
+%
+% \begin{columns}
+%     \column{.5\textwidth}
+%     数据库设计并运行后，修改 \rule{1cm}{0.15mm} 相对比较简单。
+%
+% \begin{itemize}
+%     \item 逻辑模式
+%     \item 物理模式
+% \end{itemize}
+%     \column{.5\textwidth}
+%     \begin{tikzpicture}[
+%         node distance=2cm,
+%         title/.style={font=\color{black!50}\ttfamily, fill=orange!30,},
+%         typetag/.style={rectangle, draw=black!50, font=\ttfamily, anchor=west}
+%       ]
+%         \node (decomp) [title] { \normalsize 视图层 (view level)};
+%
+%         \node (di) [below=of decomp.west, typetag, yshift=0.5cm] { view 1 };
+%         \node (dr) [right=of di.west, typetag] { view 2 };
+%         \node (dots) [right=of dr.west] {...};
+%         \node (dnc) [right=of dots.west, typetag, xshift=-1cm] { view n };
+%
+%         \node [draw=black!50,  fit={(decomp) (di) (dr) (dots) (dnc)}] (view){};
+%
+%         \node[draw=black!50, below=of view, yshift=1cm,title](logical){逻辑层 (logical level)};
+%
+%         \node[draw=black!50, below=of logical, yshift=1cm,title](physical){物理层 (physical level)}; 
+%
+%         \draw[-, thick] (view) -- (logical);
+%         \draw[-, thick] (logical) -- (physical);
+%
+%       \end{tikzpicture}
+% \end{columns}
+%
+% \end{frame}
 
 
 \begin{frame}
