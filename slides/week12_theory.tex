@@ -987,14 +987,54 @@ CREATE INDEX id_idx ON test_index(id);
 \end{frame}
 
 \begin{frame}
-	\frametitle{思考}
+	\frametitle{思考1}
+	索引一定能提高查询性能吗？考虑下面的场景：用户关系中有`gender`字段，并基于`gender`建立了索引，假设男女比例大致1:1。那么在查询\texttt{SELECT name FROM gender = 'M'}时，性能如何？
+\end{frame}
+
+\begin{frame}
+	\frametitle{思考2}
 	假设1个page（4KB）能够容纳100个索引项，那么对于100,000,000条元组，需要使用1,000,000个page（即4GB）来保存索引。考虑到内存的限制，应该如何做？
 
 
 \end{frame}
 
 \begin{frame}
-	\section{\textcolor{darkmidnightblue}{3. 事务（transaction）}}
+	\section{\textcolor{darkmidnightblue}{3. 查询计划}}
+
+	\begin{figure}
+		\includegraphics[width=0.8\linewidth]{week11/query}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{3.1 查询的基本步骤}
+	\begin{itemize}
+		\item 解析（parsing）：将SQL语句转换为内部表示
+		\item \alert{优化}（optimization）：生成查询计划
+		\item 执行（execution）：执行查询计划
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{3.2 查询优化}
+
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+select salary
+from instructor
+where salary < 75000;
+  \end{minted}
+
+	可以表示成两种可能的关系代数（即查询计划）：
+
+	\begin{itemize}
+		\item $\sigma_{salary < 75000}(\Pi_{salary}(\text{instructor}))$
+		\item $\Pi_{salary}(\sigma_{salary < 75000}(\text{instructor}))$
+	\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+	\section{\textcolor{darkmidnightblue}{4. 事务（transaction）}}
 	The term \alert{transaction} refers to a collection of operations that form a single logical unit of work.
 	\begin{itemize}
 		\item 原子性（atomicity）
@@ -1003,6 +1043,52 @@ CREATE INDEX id_idx ON test_index(id);
 		\item 持久性（durability）
 	\end{itemize}
 
+\end{frame}
+
+\begin{frame}[fragile]{4.1 A（原子性）}
+
+	一个事务的所有操作要么全部成功执行，要么在发生故障时撤销每个未完成事务的部分效果，这是非常重要的。这个特性被称为原子性（atomicity）。
+
+	\begin{minted}[bgcolor=LightGray, baselinestretch=1.1]{sql}
+BEGIN;
+UPDATE accounts SET balance = balance - 100.00
+    WHERE name = 'Alice';
+-- etc etc
+COMMIT;
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{4.2 D（持久性）}
+	此外，一旦一个事务成功执行，它的效果必须持久地保存在数据库中——系统故障不应导致数据库遗忘已经成功完成的事务。这个特性被称为持久性（durability）。
+\end{frame}
+
+
+\begin{frame}[fragile]{4.3 I（隔离性）}
+	在一个允许多个事务并发执行的数据库系统中，如果对共享数据的更新没有得到控制，事务可能会看到由其他事务更新所产生的不一致的中间状态。这种情况可能导致对数据库中数据的错误更新。因此，数据库系统必须提供机制，将一个事务与其他并发执行事务的影响隔离开来。这个特性被称为隔离性（isolation）。
+\end{frame}
+
+\begin{frame}[fragile]{4.4 C（一致性）}
+	\begin{block}{Consistency}
+		Execution of a transaction in isolation (i.e., with no other transaction executing concurrently) preserves the consistency of the database.
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{4.5 事务隔离等级}
+	\begin{itemize}
+		\item \textbf{Serializable} 通常能够确保事务的串行化执行。
+
+		\item \textbf{Repeatable Read} 只允许读取已提交的数据，并进一步要求，在一个事务两次读取某个数据项之间，不允许其他事务对该数据项进行更新。
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{itemize}
+		\item \textbf{Read Committed} 只允许读取已提交的数据，但不保证可重复读取。例如，在同一个事务两次读取某个数据项之间，另一个事务可能已经更新了该数据项并提交。\alert{大部分DBMS的默认隔离等级}
+
+		\item \textbf{Read Uncommitted} 允许读取未提交的数据。它是 SQL 中允许的最低隔离级别。
+	\end{itemize}
+
+	查阅资料，什么是\alert{dirty read}？上述哪种隔离级别会导致\alert{dirty read}？什么是\alert{幻读}、\alert{不可重复读}？
 \end{frame}
 
 \begin{frame}
