@@ -1,15 +1,18 @@
 # Project 2025 for DB
 
 ## 要求
-- 请使用《计算机学报》模板（[Word](http://cjc.ict.ac.cn/wltg/new/submit/index.asp)或[Latex](https://www.overleaf.com/latex/templates/ji-suan-ji-xue-bao-guan-fang-latexmo-ban-xiu-gai-wei-overleafke-yong-ban/mjhxhmnqvvyn)），并**打印**提交给助教；最晚17周周日；清楚地标明姓名、学号、题目
+
+- 请使用《计算机学报》模板（[Word](http://cjc.ict.ac.cn/wltg/new/submit/index.asp)或[Latex](https://www.overleaf.com/latex/templates/ji-suan-ji-xue-bao-guan-fang-latexmo-ban-xiu-gai-wei-overleafke-yong-ban/mjhxhmnqvvyn)），并**打印**提交给助教；最晚18周周日；清楚地标明姓名、学号、题目
 - 最多3个人一组
 - 要求提供GitHub代码仓库链接
 - 报告需要清楚地说明*关键设计*、*如何使用*等重要内容
 
 ## 题目
+
 可以从以下题目中选择一个进行研究，或者提出自己的题目，但需要提前征得老师同意。
 
 ### 题目一
+
 设计一个命令行工具（可以使用[hyper](https://github.com/fastapi/typer)等），首先初始化创建数据库`project2025`，
 
 - 自行设计并录入题目二的关系模式
@@ -19,6 +22,7 @@
 - 能够重置系统，以便录入新的关系模式
 
 ### 题目二
+
 设计一个智能家居系统，要求使用[fastapi](https://fastapi.tiangolo.com/)或类似框架提供API管理智能家居，包括但不限于使用纪录、用户信息、安防事件、用户反馈等数据。根据实际情况自行设计数据库，在常规的增删改查之外，能够至少回答下面的问题：
 
 - 分析不同设备的使用频率和使用时间段
