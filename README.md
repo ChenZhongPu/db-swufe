@@ -6,10 +6,12 @@ The textbook is [Database System Concepts](https://www.db-book.com/).
 
 ## Main Tools
 
-- [PostgreSQL 17](https://www.postgresql.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [DuckDB](https://duckdb.org/)
 - [DataGrip](https://www.jetbrains.com/datagrip/)
 
-> You can gain free access to DataGrip via [JetBrains Education Pack](https://www.jetbrains.com/community/education/#students).
+> [!NOTE]
+> Good news: DataGrip is free for non-commercial use.
 
 As for database management tools, other alternatives:
 

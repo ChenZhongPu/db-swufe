@@ -96,7 +96,7 @@
 	\frametitle{关于我：陈中普}
 
 	\begin{block}{\faIcon{book} 研究方向}
-		数据库，大语言模型
+		数据库系统，AI4DB
 	\end{block}
 
 	\begin{block}{\faIcon{building} 办公室}
@@ -140,10 +140,9 @@
 	原则上几乎不需要预备知识，掌握\alert{阅读文档}（尤其是英文文档）和\alert{安装软件}的能力即可。
 	\pause
 	\begin{block}{重点}
-		本课程是应用导向的，因此存储、查询优化、事务等技术几乎不涉及。重点是：
 		\begin{itemize}
-			\item  如何使用数据库
-			\item  如何设计数据库
+			\item (对于CS专业) 理论和应用同等重要
+			\item  （对于非CS专业）主要是如何应用数据库
 		\end{itemize}
 
 	\end{block}
@@ -175,43 +174,51 @@
 \begin{frame}
 	\frametitle{评价标准}
 
-	\begin{tikzpicture}
-		\colorlet{good}{green!75!black}
-		\colorlet{bad}{red}
-		\colorlet{neutral}{black!60}
-		\colorlet{none}{blue!75!black}
+\begin{tikzpicture}
+    \colorlet{good}{green!75!black}    % 期末测试
+    \colorlet{bad}{red}                % 作业
+    \colorlet{neutral}{orange!80}      % 期末自评 (新增)
+    \colorlet{none}{blue!75!black}     % 期末Project
 
-		\node[align=center,text width=3cm]{考核};
+    \node[align=center,text width=3cm]{\textbf{考核权重}};
 
-		\begin{scope}[line width=4mm,rotate=270]
-			\draw[good]          (216:2cm) arc (216:360:2cm);
-			\draw[bad]  (0:2cm)  arc (0:108:2cm);
-			\draw[none] (108:2cm) arc (108:216:2cm);
+    \begin{scope}[line width=4mm,rotate=270]
+        % 1. 期末测试 (30%): 0 到 108 度
+        \draw[good] (0:2cm) arc (0:108:2cm);
+        
+        % 2. 作业 (30%): 108 到 216 度
+        \draw[bad] (108:2cm) arc (108:216:2cm);
+        
+        % 3. 期末Project (20%): 216 到 288 度
+        \draw[none] (216:2cm) arc (216:288:2cm);
+        
+        % 4. 期末自评 (20%): 288 到 360 度
+        \draw[neutral] (288:2cm) arc (288:360:2cm);
 
-			\newcount\mycount
-			\foreach \angle in {0,72,...,3599}
-				{
-					\mycount=\angle\relax
-					\divide\mycount by 10\relax
-					\draw[black!15,thick] (\the\mycount:18mm) -- (\the\mycount:22mm);
-				}
+        % 刻度线 (每 7.2 度一个刻度，共 50 个刻度表示 100%)
+        \newcount\mycount
+        \foreach \angle in {0,7.2,...,359}
+            {
+                \draw[black!15,thick] (\angle:18mm) -- (\angle:22mm);
+            }
 
-			\draw (-90:2.2cm) node[left] {期末Project (40\%)};
-			\draw (65:2.2cm) node[right] {作业 (30\%)};
-			\draw (130:2.2cm) node[right] {期末测试 (30\%)};
-		\end{scope}
-	\end{tikzpicture}
+        % 文字标注 (根据旋转后的坐标手动微调位置)
+        \draw (54:2.3cm)  node[right] {期末测试 (30\%)};
+        \draw (165:2.5cm) node[right]  {作业 (30\%)};
+        \draw (252:2.3cm) node[left]  {期末Project (20\%)};
+        \draw (324:2.3cm) node[left] {期末自评 (20\%)};
+    \end{scope}
+\end{tikzpicture}
 	\begin{tikzpicture}
 		\node[fill=red!80, text=white, blur shadow={shadow xshift=-0.5ex},
 			text width=8em,anchor=south west,rounded corners, ]
 		{严禁抄袭！
 		};
 	\end{tikzpicture}
-	其中，Project成绩暂定是学生自行评定。
 \end{frame}
 \begin{frame}
-	\frametitle{软件工具}
-	PostgreSQL 17: \emph{The World's Most Advanced Open Source Relational Database}
+  \frametitle{软件工具：PostgreSQL}
+	PostgreSQL 18: \emph{The World's Most Advanced Open Source Relational Database}
 
 	\includegraphics[width=.9\paperwidth]{image/pg-home}
 \end{frame}
@@ -242,10 +249,12 @@
 		\item 会什么选什么。PG 功能强大，但是我只会玩 MySQL 所以我用 MySQL 。
 		\item 选 mysql，用 pg 的人一般不会有这个疑问。
 	\end{itemize}
+
+  \href{https://openai.com/index/scaling-postgresql/}{Scaling PostgreSQL to power 800 million ChatGPT users}
 \end{frame}
 
 \begin{frame}
-	\frametitle{软件工具}
+	\frametitle{软件工具：DataGrip}
 	\href{https://www.jetbrains.com/datagrip/}{DataGrip}，Navicat，pgAdmin，...
 
 	\begin{center}
@@ -253,6 +262,17 @@
 	\end{center}
 
 \end{frame}
+
+\begin{frame}
+  \frametitle{软件工具：DuckDB}
+  \href{https://duckdb.org/}{DuckDB}，嵌入式分析型数据库，适合学习数据库应用。
+
+	\begin{center}
+		\includegraphics[width=.55\paperwidth]{image/duckdb}
+	\end{center}
+
+\end{frame}
+
 \begin{frame}
 	\frametitle{AI时代下的基础数据库教学}
 
@@ -268,6 +288,7 @@
 
 	{\tiny Li, Boyan, et al. "The Dawn of Natural Language to SQL: Are We Fully Ready?." Proceedings of the VLDB Endowment 17.11 (2024): 3318-3331.}
 \end{frame}
+
 
 \begin{frame}
 	\begin{center}
