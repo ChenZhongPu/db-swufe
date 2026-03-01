@@ -138,7 +138,7 @@
 \begin{frame}
 	\frametitle{预备知识}
 	原则上几乎不需要预备知识，掌握\alert{阅读文档}（尤其是英文文档）和\alert{安装软件}的能力即可。
-	\pause
+
 	\begin{block}{重点}
 		\begin{itemize}
 			\item (对于CS专业) 理论和应用同等重要
@@ -174,41 +174,41 @@
 \begin{frame}
 	\frametitle{评价标准}
 
-\begin{tikzpicture}
-    \colorlet{good}{green!75!black}    % 期末测试
-    \colorlet{bad}{red}                % 作业
-    \colorlet{neutral}{orange!80}      % 期末自评 (新增)
-    \colorlet{none}{blue!75!black}     % 期末Project
+	\begin{tikzpicture}
+		\colorlet{good}{green!75!black}    % 期末测试
+		\colorlet{bad}{red}                % 作业
+		\colorlet{neutral}{orange!80}      % 期末自评 (新增)
+		\colorlet{none}{blue!75!black}     % 期末Project
 
-    \node[align=center,text width=3cm]{\textbf{考核权重}};
+		\node[align=center,text width=3cm]{\textbf{考核权重}};
 
-    \begin{scope}[line width=4mm,rotate=270]
-        % 1. 期末测试 (30%): 0 到 108 度
-        \draw[good] (0:2cm) arc (0:108:2cm);
-        
-        % 2. 作业 (30%): 108 到 216 度
-        \draw[bad] (108:2cm) arc (108:216:2cm);
-        
-        % 3. 期末Project (20%): 216 到 288 度
-        \draw[none] (216:2cm) arc (216:288:2cm);
-        
-        % 4. 期末自评 (20%): 288 到 360 度
-        \draw[neutral] (288:2cm) arc (288:360:2cm);
+		\begin{scope}[line width=4mm,rotate=270]
+			% 1. 期末测试 (30%): 0 到 108 度
+			\draw[good] (0:2cm) arc (0:108:2cm);
 
-        % 刻度线 (每 7.2 度一个刻度，共 50 个刻度表示 100%)
-        \newcount\mycount
-        \foreach \angle in {0,7.2,...,359}
-            {
-                \draw[black!15,thick] (\angle:18mm) -- (\angle:22mm);
-            }
+			% 2. 作业 (30%): 108 到 216 度
+			\draw[bad] (108:2cm) arc (108:216:2cm);
 
-        % 文字标注 (根据旋转后的坐标手动微调位置)
-        \draw (54:2.3cm)  node[right] {期末测试 (30\%)};
-        \draw (165:2.5cm) node[right]  {作业 (30\%)};
-        \draw (252:2.3cm) node[left]  {期末Project (20\%)};
-        \draw (324:2.3cm) node[left] {期末自评 (20\%)};
-    \end{scope}
-\end{tikzpicture}
+			% 3. 期末Project (20%): 216 到 288 度
+			\draw[none] (216:2cm) arc (216:288:2cm);
+
+			% 4. 期末自评 (20%): 288 到 360 度
+			\draw[neutral] (288:2cm) arc (288:360:2cm);
+
+			% 刻度线 (每 7.2 度一个刻度，共 50 个刻度表示 100%)
+			\newcount\mycount
+			\foreach \angle in {0,7.2,...,359}
+				{
+					\draw[black!15,thick] (\angle:18mm) -- (\angle:22mm);
+				}
+
+			% 文字标注 (根据旋转后的坐标手动微调位置)
+			\draw (54:2.3cm)  node[right] {期末测试 (30\%)};
+			\draw (165:2.5cm) node[right]  {作业 (30\%)};
+			\draw (252:2.3cm) node[left]  {期末Project (20\%)};
+			\draw (324:2.3cm) node[left] {期末自评 (20\%)};
+		\end{scope}
+	\end{tikzpicture}
 	\begin{tikzpicture}
 		\node[fill=red!80, text=white, blur shadow={shadow xshift=-0.5ex},
 			text width=8em,anchor=south west,rounded corners, ]
@@ -217,7 +217,7 @@
 	\end{tikzpicture}
 \end{frame}
 \begin{frame}
-  \frametitle{软件工具：PostgreSQL}
+	\frametitle{软件工具：PostgreSQL}
 	PostgreSQL 18: \emph{The World's Most Advanced Open Source Relational Database}
 
 	\includegraphics[width=.9\paperwidth]{image/pg-home}
@@ -250,7 +250,7 @@
 		\item 选 mysql，用 pg 的人一般不会有这个疑问。
 	\end{itemize}
 
-  \href{https://openai.com/index/scaling-postgresql/}{Scaling PostgreSQL to power 800 million ChatGPT users}
+	\href{https://openai.com/index/scaling-postgresql/}{Scaling PostgreSQL to power 800 million ChatGPT users}
 \end{frame}
 
 \begin{frame}
@@ -264,13 +264,20 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{软件工具：DuckDB}
-  \href{https://duckdb.org/}{DuckDB}，嵌入式分析型数据库，适合学习数据库应用。
+	\frametitle{软件工具：DuckDB}
+	\href{https://duckdb.org/}{DuckDB}，嵌入式分析型数据库，适合学习数据库应用。
 
 	\begin{center}
 		\includegraphics[width=.55\paperwidth]{image/duckdb}
 	\end{center}
 
+\end{frame}
+
+\begin{frame}
+	\frametitle{课程资源：GitHub}
+
+	{\large \url{github.com/ChenZhongPu/db-swufe}
+	}
 \end{frame}
 
 \begin{frame}
@@ -298,4 +305,16 @@
 	{\tiny \href{https://chatgpt.com/share/67bef99e-70e8-8010-abe7-6732a19093c4}{ChatGPT}}
 
 \end{frame}
+
+\begin{frame}
+	\frametitle{警惕AI时代下的BI}
+
+	{\tiny 参考 \url{https://wiki.csie.ncku.edu.tw/linux} }
+
+	\begin{block}{作家还是速记员？}
+		1866年，陀思妥耶夫斯基与出版商签下苛刻合约，必须在11月1日前交出一部长篇小说，否则未来九年的作品版权将被夺走；当时他正写《罪与罚》，债务缠身且癫痫频发，时间所剩无几。年轻速记员 Anna Grigoryevna Snitkina 受聘协助，他口述，她速记整理，26天内完成《赌徒》，如期交稿。小说次年出版，两人亦于1867年结婚，这段合作最终改变了他的人生轨迹。
+	\end{block}
+
+\end{frame}
+
 \end{document}
