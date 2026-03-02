@@ -175,38 +175,44 @@
 	\frametitle{评价标准}
 
 	\begin{tikzpicture}
-		\colorlet{good}{green!75!black}    % 期末测试
-		\colorlet{bad}{red}                % 作业
-		\colorlet{neutral}{orange!80}      % 期末自评 (新增)
-		\colorlet{none}{blue!75!black}     % 期末Project
+		\colorlet{self}{orange!80}        % 期末自评 20%
+		\colorlet{project}{blue!75!black} % 期末Project 20%
+		\colorlet{homework}{red}          % 作业 15%
+		\colorlet{quiz}{green!75!black}   % 随堂测试 40%
+		\colorlet{attendance}{purple}     % 考勤 5%
 
 		\node[align=center,text width=3cm]{\textbf{考核权重}};
 
 		\begin{scope}[line width=4mm,rotate=270]
-			% 1. 期末测试 (30%): 0 到 108 度
-			\draw[good] (0:2cm) arc (0:108:2cm);
 
-			% 2. 作业 (30%): 108 到 216 度
-			\draw[bad] (108:2cm) arc (108:216:2cm);
+			% 1. 期末自评 (20%) 0 → 72
+			\draw[self] (0:2cm) arc (0:72:2cm);
 
-			% 3. 期末Project (20%): 216 到 288 度
-			\draw[none] (216:2cm) arc (216:288:2cm);
+			% 2. 期末Project (20%) 72 → 144
+			\draw[project] (72:2cm) arc (72:144:2cm);
 
-			% 4. 期末自评 (20%): 288 到 360 度
-			\draw[neutral] (288:2cm) arc (288:360:2cm);
+			% 3. 作业 (15%) 144 → 198
+			\draw[homework] (144:2cm) arc (144:198:2cm);
 
-			% 刻度线 (每 7.2 度一个刻度，共 50 个刻度表示 100%)
-			\newcount\mycount
+			% 4. 随堂测试 (40%) 198 → 342
+			\draw[quiz] (198:2cm) arc (198:342:2cm);
+
+			% 5. 考勤 (5%) 342 → 360
+			\draw[attendance] (342:2cm) arc (342:360:2cm);
+
+			% 刻度线 (每 7.2 度 = 2%)
 			\foreach \angle in {0,7.2,...,359}
 				{
 					\draw[black!15,thick] (\angle:18mm) -- (\angle:22mm);
 				}
 
-			% 文字标注 (根据旋转后的坐标手动微调位置)
-			\draw (54:2.3cm)  node[right] {期末测试 (30\%)};
-			\draw (165:2.5cm) node[right]  {作业 (30\%)};
-			\draw (252:2.3cm) node[left]  {期末Project (20\%)};
-			\draw (324:2.3cm) node[left] {期末自评 (20\%)};
+			% 文字标注（取各区间中点）
+			\draw (36:2.3cm)  node[right] {期末自评 (20\%)};
+			\draw (108:2.3cm) node[right] {期末Project (20\%)};
+			\draw (171:2.5cm) node[right] {作业 (15\%)};
+			\draw (270:2.5cm) node[left]  {随堂测试 (40\%)};
+			\draw (351:2.3cm) node[left]  {考勤 (5\%)};
+
 		\end{scope}
 	\end{tikzpicture}
 	\begin{tikzpicture}
