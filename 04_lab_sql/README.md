@@ -4,7 +4,7 @@
 
 ## 题目一（3分+1分）
 
-> **需要**使用PostgreSQL/MySQL及DataGrip软件操作，并对操作页面及结果进行截图。
+> **需要**使用PostgreSQL/DuckDB/MySQL及DataGrip软件操作，并对操作页面及结果进行截图。
 
 1. 新建一个`university`数据库，并执行`largeRelationsInsertFile.sql`，导入数据。
 2. 运行第2次作业的题目三代码。注意：把原题目中的`会计`改成`History`。
@@ -13,13 +13,13 @@
 
 （二选一）
 
-### PostgreSQL
+### PostgreSQL/DuckDB
 
-参考[Pattern Matching](https://www.postgresql.org/docs/17/functions-matching.html)，在PG中使用至少三种方法实现找到所有以`S`开头教师的名字。
+参考[Pattern Matching](https://www.postgresql.org/docs/18/functions-matching.html)或[Pattern Matching](https://duckdb.org/docs/stable/sql/functions/pattern_matching)，在PG/DuckDB中使用至少3种方法实现找到所有以`S`开头教师的名字。
 
 ### MySQL
 
-参考[Pattern Matching](https://dev.mysql.com/doc/refman/8.4/en/pattern-matching.html)和[String Functions and Operators](https://dev.mysql.com/doc/refman/8.4/en/string-functions.html) ，在MySQL中使用至少三种方法实现找到所有以`S`开头教师的名字。
+参考[Pattern Matching](https://dev.mysql.com/doc/refman/8.4/en/pattern-matching.html)和[String Functions and Operators](https://dev.mysql.com/doc/refman/8.4/en/string-functions.html) ，在MySQL中使用至少3种方法实现找到所有以`S`开头教师的名字。
 
 ## 题目三（3分）
 

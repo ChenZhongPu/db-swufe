@@ -4,9 +4,9 @@
 
 ## 题目一（4分）
 
-在数据库中创建该关系，并自建上面关系的txt数据文件：
+在数据库中创建该关系，并自建上面关系的CSV数据文件：
 
-1. 使用`COPY`命令导入数据库（PostgreSQL）；或使用`LOAD DATA`命令导入数据库（MySQL）。
+1. 使用`COPY`命令导入数据库（PostgreSQL/DuckDB）；或使用`LOAD DATA`命令导入数据库（MySQL）。
 2. 将该关系导出为任意文件（如SQL、Txt、CSV、JSON等）。
 
 ## 题目二（6分）
@@ -20,7 +20,7 @@
 
 ## 题目三（5分）
 
-### 针对PostgreSQL
+### 针对PostgreSQL/DuckDB
 
 使用参考下面的语句添加10万条商品，
 
@@ -38,4 +38,3 @@ FROM generate_series(1, 100000);
 ### 针对MySQL
 
 参考`generate_data.py`生成数据，在MySQL比较`LOAD DATA`和[SELECT INTO](https://dev.mysql.com/doc/refman/8.0/en/select-into.html)的性能差异。
-
