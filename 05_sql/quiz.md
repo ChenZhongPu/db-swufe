@@ -8,9 +8,10 @@
 
 ```sql
 SELECT 1 in (1, 2, 3);
+SELECT '12121' IN (SELECT id FROM instructor);
 ```
 
-查阅资料，使用`IN`使用下面`INTERSECT`的功能（不考虑性能）：
+查阅资料，使用`IN`实现下面`INTERSECT`的功能（不考虑性能）：
 
 ```sql
 (SELECT course_id
