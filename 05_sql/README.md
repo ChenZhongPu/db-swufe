@@ -37,3 +37,42 @@ SELECT (1, 2) = (1, 2);
 
 SELECT (1) IN (1, 2);
 ```
+
+---
+
+## Some Links
+
+- [Why doesn't COUNT(DISTINCT (\*)) work?](https://stackoverflow.com/questions/5010470/why-doesnt-countdistinct-work)
+- [Python: any()](https://realpython.com/any-python/)
+- [Python: all()](https://realpython.com/python-all/)
+
+---
+
+## 聚合函数扩展
+
+```sql
+SELECT dept_name, min(salary)
+FROM instructor;
+```
+
+> SELECT 中未被聚合函数包裹的列，必须出现在 GROUP BY 子句中。
+
+| 数据库     | 默认行为                                |
+| ---------- | --------------------------------------- |
+| PostgreSQL | 严格遵守标准，支持函数依赖              |
+| MySQL 5.7+ | 默认开启 `ONLY_FULL_GROUP_BY`，严格模式 |
+| SQLite     | 宽松，允许未分组列（取任意值）          |
+| SQL Server | 严格遵守标准                            |
+| Oracle     | 严格遵守标准                            |
+
+```
+❯ sqlite3 mydb.db < DDL.sql
+❯ sqlite3 mydb.db < smallRelationsInsertFile.sql
+❯ sqlite3 mydb.db
+SQLite version 3.51.0 2025-06-12 13:14:41
+Enter ".help" for usage hints.
+sqlite> SELECT MIN(salary) FROM instructor;
+40000
+sqlite> SELECT name, MIN(salary) FROM instructor;
+Mozart|40000
+```
