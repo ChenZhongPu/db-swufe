@@ -1118,7 +1118,7 @@ WHERE EXISTS(SELECT 1 FROM teaches
 }
 
 \begin{frame}[fragile]
-	\frametitle{练习}
+	\frametitle{练习（1）}
 	阅读课本 P.104，试用多表查询实现下面的嵌套查询。
 
 	\begin{minted}[bgcolor=LightGray]{sql}
@@ -1131,6 +1131,28 @@ WHERE EXISTS(SELECT 1 FROM teaches
     AND takes.semester = teaches.semester
     AND takes.year = teaches.year);
     \end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{练习（2）}
+下面的查询是否等价？
+
+	\begin{minted}[bgcolor=LightGray, fontsize=\footnotesize]{sql}
+SELECT DISTINCT i.name
+FROM instructor i, teaches t WHERE i.id = t.id;
+
+SELECT name
+FROM instructor WHERE id IN (
+  SELECT id FROM teaches
+);
+
+SELECT name
+FROM instructor i
+WHERE EXISTS (
+  SELECT * FROM teaches t WHERE t.id = i.id
+);
+  \end{minted}
 
 \end{frame}
 
