@@ -117,9 +117,7 @@ GROUP BY course_id, sec_id;
 
 \begin{frame}[fragile]
 	\frametitle{练习 (2)}
-	考虑大学数据库，找出 2017 年秋季 (Fall) 开设的每个课程段 (\texttt{section}) 的选课人数。（提示：包括选课人数等于 0 的课程段，使用关系 \texttt{takes} 和 \texttt{section}）
-
-	\pause
+	考虑大学数据库，找出 2017 年秋季 (fall) 开设的每个课程段 (\texttt{section}) 的选课人数。（提示：包括选课人数等于 0 的课程段，使用关系 \texttt{takes} 和 \texttt{section}）
 
 	\begin{minted}[bgcolor=LightGray, baselinestretch=.9, fontsize=\small]{sql}
 SELECT course_id, sec_id,
@@ -134,6 +132,47 @@ WHERE semester = 'Fall'
 AND year = 2017;
 \end{minted}
 
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{思考}
+	考虑大学数据库，找出 2017 年秋季 (fall) 开设的每个课程段 (\texttt{section}) 的选课人数。（提示：包括选课人数等于 0 的课程段，使用关系 \texttt{takes} 和 \texttt{section}）
+
+	\begin{minted}[bgcolor=LightGray, baselinestretch=.9, fontsize=\small]{sql}
+-- 下面的查询是否正确？
+SELECT section.course_id, section.sec_id, COUNT(takes.id)
+FROM takes, section
+WHERE takes.year = section.year
+        AND takes.semester = section.semester
+        AND takes.course_id = section.course_id
+        AND takes.sec_id = section.sec_id
+        AND section.semester = 'Fall'
+        AND section.year = 2017
+GROUP BY section.course_id, section.sec_id;
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+	\begin{minted}[bgcolor=LightGray, baselinestretch=.9, fontsize=\small]{sql}
+ WITH section_tmp(course_id, sec_id, semester, year) AS (
+    VALUES
+        ('CS101', '1', 'Fall', 2017),   -- 有人选
+        ('CS102', '1', 'Fall', 2017)    -- 无人选 ← 关键
+),
+takes_tmp(id, course_id, sec_id, semester, year) AS (
+    VALUES
+        ('s001', 'CS101', '1', 'Fall', 2017)
+)
+SELECT s.course_id, s.sec_id, COUNT(t.id) AS student_count
+FROM takes_tmp t, section_tmp s
+WHERE t.year      = s.year
+  AND t.semester  = s.semester
+  AND t.course_id = s.course_id
+  AND t.sec_id    = s.sec_id
+  AND s.semester  = 'Fall'
+  AND s.year      = 2017
+GROUP BY s.course_id, s.sec_id;
+\end{minted}
 \end{frame}
 
 {
@@ -200,6 +239,7 @@ FROM student NATURAL JOIN takes;
 
 	\begin{minted}[bgcolor=LightGray, baselinestretch=.9]{sql}
 -- 笛卡尔积可以理解成 cross join
+-- 下面的代码在 DuckDB 中无效
 SELECT *
 FROM student, takes
 WHERE student.id = takes.id;
