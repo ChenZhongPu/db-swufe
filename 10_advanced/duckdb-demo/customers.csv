@@ -1,0 +1,8 @@
+customer_id,name,city,signup_date,lifetime_value
+1,Alice Chen,Shanghai,2025-01-03,1280.50
+2,Bob Liu,Beijing,2025-02-14,860.00
+3,Carol Wang,Chengdu,2025-03-09,430.25
+4,David Zhang,Shanghai,2025-04-22,1510.90
+5,Eva Li,Guangzhou,2025-05-18,760.40
+6,Frank Zhao,Beijing,2025-06-11,980.75
+

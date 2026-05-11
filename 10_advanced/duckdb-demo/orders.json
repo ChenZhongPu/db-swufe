@@ -1,0 +1,41 @@
+[
+  {
+    "order_id": 1001,
+    "customer_id": 1,
+    "order_date": "2026-01-10",
+    "status": "paid",
+    "items": [
+      {"sku": "BK-001", "product": "Database Systems", "quantity": 1, "price": 89.0},
+      {"sku": "BK-009", "product": "SQL Practice", "quantity": 2, "price": 35.5}
+    ]
+  },
+  {
+    "order_id": 1002,
+    "customer_id": 2,
+    "order_date": "2026-01-12",
+    "status": "paid",
+    "items": [
+      {"sku": "HW-101", "product": "USB-C Hub", "quantity": 1, "price": 119.0}
+    ]
+  },
+  {
+    "order_id": 1003,
+    "customer_id": 1,
+    "order_date": "2026-01-15",
+    "status": "refunded",
+    "items": [
+      {"sku": "BK-009", "product": "SQL Practice", "quantity": 1, "price": 35.5}
+    ]
+  },
+  {
+    "order_id": 1004,
+    "customer_id": 4,
+    "order_date": "2026-01-20",
+    "status": "paid",
+    "items": [
+      {"sku": "BK-001", "product": "Database Systems", "quantity": 1, "price": 89.0},
+      {"sku": "HW-207", "product": "Portable SSD", "quantity": 1, "price": 499.0}
+    ]
+  }
+]
+
