@@ -225,6 +225,40 @@
 	\end{tikzpicture}
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Multi-Model DBMSs}
+  在\url{https://db-engines.com/en/ranking}中，主流数据库的分类都是：\textbf{Relational，Multi-Model}。因此，它们支持非关系的存储和操作，并不一定要求1NF。
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1]{sql}
+-- DuckDB 
+CREATE TABLE example (j JSON);
+INSERT INTO example VALUES('{"name": "Mike", "age": 20, 
+            "hobbies": ["Baskeball", "Sing", "Dance"]}');
+SELECT j->'$.name' FROM example;
+\end{minted}
+
+\small{\url{https://duckdb.org/docs/current/data/json/json_functions}}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{练习}
+  {\small 参考 \url{https://www.postgresql.org/docs/current/datatype-json.html}，在PostgreSQL中实现：}
+
+
+\begin{minted}[bgcolor=LightGray, baselinestretch=1,fontsize=\small]{sql}
+CREATE TABLE employees (
+    id SERIAL PRIMARY KEY,
+    attributes JSONB
+);
+-- INSERT，包括name、title、skills
+SELECT attributes->>'name' FROM employees WHERE id = 1; 
+SELECT attributes->'skills' FROM employees WHERE id = 1; 
+SELECT attributes->>'Name' FROM employees
+WHERE attributes->'skills' @> '["Python"]';
+\end{minted}
+\end{frame}
+
 \begin{frame}
 	\section{\textcolor{darkmidnightblue}{2. 利用函数依赖进行分解}}
 	Functional dependencies
@@ -235,7 +269,7 @@
 	\begin{itemize}
 		\item \textbf{属性集}：使用希腊字母（如$\alpha$）
 		\item \textbf{关系模式}：一般使用$r(R)$，其中$r$是关系名，$R$是属性列表。
-		\item \textbf{超码}：当属性集是一个超码，使用$K$表示。我们可以是“K是R的一个超码”。
+		\item \textbf{超码}：当属性集是一个超码，使用$K$表示。我们可以说“K是R的一个超码”。
 	\end{itemize}
 
 	True or False: Given $r(R)$, a subset $K$ of $R$ is a superkey of $r(R)$ if, in any legal instance of $r(R)$, for all pairs $t_1$ and $t_2$ of tuples in the instance of $r$ if $t_1 \neq t_2$, then $t_1[K] \neq t_2[K]$.
@@ -282,7 +316,6 @@
 	\frametitle{依赖闭包}
 	函数依赖可以进行推断（运算），如从$A \rightarrow B$和$B \rightarrow C$可以推断$A \rightarrow C$。因此，函数依赖可以构成\alert{闭包}（closure）。我们用$F^+$表示集合$F$的闭包。
 
-	\pause
 	\begin{exampleblock}{依赖闭包和函数依赖}
 		如果下面至少一个函数依赖属于$F^+$，那么$R_1$和$R_2$就构成了R的无损分解：
 
@@ -293,6 +326,7 @@
 	\end{exampleblock}
 
 \end{frame}
+
 
 \begin{frame}
 	\frametitle{例子}
@@ -319,6 +353,59 @@
 	\end{itemize}
 
 
+\end{frame}
+
+\begin{frame}
+  \frametitle{练习}
+假设将R=(A, B, C, D, E)被分解成(A, B, C)和(A, D, E)。如果下面的函数依赖成立，请说明该分解是无损的。
+
+\begin{itemize}
+  \item $A \rightarrow BC$
+  \item $CD \rightarrow E$
+  \item $B \rightarrow D$
+  \item $E \rightarrow A$
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{闭包}
+定义：给定一个集合 $S$ 和其上的某种运算 $\circ$。如果对于 $S$ 中的任意元素 $a$ 和 $b$，经过该运算后的结果 $a \circ b$ 仍然属于集合 $S$，我们就说集合 $S$ 对运算 $\circ$ 是封闭的。
+
+通俗理解：在这个集合里做运算，结果永远“跑不出”这个集合的边界。
+\end{frame}
+
+\begin{frame}
+  \frametitle{阿姆斯特朗公理}
+  应用\alert{阿姆斯特朗公理（Armstrong's axioms）}可以找到闭包$F^+$：
+  \begin{itemize}
+    \item \alert{自反律}（Reflexivity rule）：如果 $\alpha$ 是一个属性集且 $\beta \subseteq \alpha$，那么 $\alpha \rightarrow \beta$ 成立。
+    \item \alert{增广律}（Augmentation rule）：如果 $\alpha \rightarrow \beta$ 成立且 $\gamma$ 是一个属性集，那么 $\gamma\alpha \rightarrow \gamma\beta$ 成立。
+    \item \alert{传递律}（Transitivity rule）：如果 $\alpha \rightarrow \beta$ 成立且 $\beta \rightarrow \gamma$ 成立，那么 $\alpha \rightarrow \gamma$ 成立。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{思考}
+下面的规则是否成立？
+
+\begin{itemize}
+\item 如果 $\alpha \rightarrow \beta$ 成立且 $\alpha \rightarrow \gamma$ 成立，那么 $\alpha \rightarrow \beta\gamma$ 成立。
+\item 如果 $\alpha \rightarrow \beta\gamma$ 成立，那么 $\alpha \rightarrow \beta$ 成立且 $\alpha \rightarrow \gamma$ 成立。
+\item 如果 $\alpha \rightarrow \beta$ 成立且 $\gamma\beta \rightarrow \delta$ 成立，那么 $\alpha\gamma \rightarrow \delta$ 成立。
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{基于阿姆斯特朗公理的推论}
+
+\begin{itemize}
+  \item \alert{合并律}（Union rule）：如果 $\alpha \rightarrow \beta$ 成立且 $\alpha \rightarrow \gamma$ 成立，那么 $\alpha \rightarrow \beta\gamma$ 成立。
+  \item \alert{分解律}（Decomposition rule）：如果 $\alpha \rightarrow \beta\gamma$ 成立，那么 $\alpha \rightarrow \beta$ 成立且 $\alpha \rightarrow \gamma$ 成立。
+  \item \alert{伪传递律}（Pseudotransitivity rule）：如果 $\alpha \rightarrow \beta$ 成立且 $\gamma\beta \rightarrow \delta$ 成立，那么 $\alpha\gamma \rightarrow \delta$ 成立。
+\end{itemize}
 \end{frame}
 
 \begin{frame}
