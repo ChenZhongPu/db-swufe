@@ -284,3 +284,110 @@ GROUP BY city;
 - 高并发短事务、强实时点写
 - 频繁`SELECT *`并返回整行（会放大“拼回行”的成本）
 - 数据量很小（元数据与执行开销可能抵消收益）
+## 3. 存储细节
+
+前面两节讨论的是"数据结构层面"的存储与索引。本节则深入 DBMS 实现层，介绍数据库如何真正地在磁盘上组织、存储数据。
+
+### （1）存储层级与延迟
+
+主流数据库是基于**磁盘**（非易失存储）的，计算时需要将数据从磁盘读入**内存**（易失存储）。不同存储介质之间的访问延迟差异极大：
+
+| 存储介质 | 实际延迟 | 类比（将 L1 Cache 设为 1 秒） |
+|---|---|---|
+| L1 Cache | 1 ns | 1 秒 |
+| L2 Cache | 4 ns | 4 秒 |
+| DRAM | 100 ns | 100 秒 |
+| SSD | 16,000 ns | 4.4 小时 |
+| HDD | 2,000,000 ns | 3.3 周 |
+
+> 数据来源：[Latency Numbers Every Programmer Should Know](https://colin-scott.github.io/personal_website/research/interactive_latency.html)
+
+此外，磁盘不适合随机访问。因此在设计 DBMS 时，需要尽可能**连续**访问，而不是**随机**访问。两个核心问题是：
+- DBMS 如何在磁盘中存储数据？
+- DBMS 如何管理内存并与磁盘来回移动数据？
+
+### （2）文件与 Page
+
+DBMS 将数据库存储为若干文件（尽管使用自定义格式，连操作系统通常也不知道文件内容的含义）。这些文件被组织成一组固定大小的数据块，称为 **page**。
+
+> A page is a fixed-size block of data.
+
+注意"page"在不同层次有不同含义：
+- 硬件 page：一般是 4 KB
+- OS page：一般是 4 KB
+- DB page：4 KB–16 KB（例如 SQLite 4 KB、PostgreSQL 8 KB、MySQL InnoDB 16 KB）
+
+### （3）Page 的组织
+
+DBMS 可以使用不同的方式组织 pages：
+
+- **堆文件组织**（heap file organization）：page 无序堆放，是最常见的默认方式
+- 树文件组织
+- 顺序文件组织
+- 哈希文件组织
+
+堆文件（heap file）是 page/record 的无序集合，元组随机存储。当需要插入变长记录时，DBMS 需要知道哪个 block 有足够空间。大多数 DBMS 都维护一个 **free-space map**，用于追踪每个 block 的空余空间。例如在 PostgreSQL 中，每个元素占一个字节，其值除以 256 即为该 block 的空闲比例。
+
+### （4）Page 的内容
+
+每个 page 由 **header** 和 **data** 两部分构成。header 是描述该 page 内容的元数据，包含：
+
+- page 大小
+- 校验和（checksum）
+- DBMS 版本
+- 压缩信息
+- ……
+
+**定长元组的 page layout**：如果元组都是定长的，最大的难点是如何记录被删除的元组。一种方案是使用 *free list*：维护一个链表，记录哪些槽位已被释放可以复用。
+
+**变长元组的 page layout**：当数据含有变长字段（如 `varchar`、`text`）时，通常使用 $(offset, length)$ 来标记变长字段的位置。为了高效管理变长元组，最常用的结构是**分槽页**（slotted pages）：使用一个 slot array 记录每个元组的起始位置和大小，元组从 page 尾部向前增长，slot array 从头部向后增长，中间是空闲空间。
+
+```
+| Header | Slot1 | Slot2 | Slot3 | ... free space ... | Tuple#3 | Tuple#2 | Tuple#1 |
+```
+
+PostgreSQL 的 slotted page 设计可参考：<https://www.postgresql.org/docs/current/storage-page-layout.html>
+
+### （5）物理元组 ID
+
+DBMS 通常会给每个逻辑元组分配一个**物理元组 ID**（physical tuple ID），用于唯一标识一条记录的物理位置。各数据库的实现方式不同：
+
+| 数据库 | 行 ID 列名 |
+|---|---|
+| Oracle | ROWID |
+| SQLite | ROWID |
+| PostgreSQL | CTID |
+| MySQL | N/A |
+
+在 PostgreSQL 中，`CTID` 是一个二元组 `(page_id, slot_id)`，可以直接查询：
+
+```sql
+SELECT CTID FROM student;
+```
+
+### （6）大对象存储
+
+SQL 支持 `blob`（二进制大对象）和 `clob`（字符大对象）类型。然而，很多 DBMS 要求**记录的大小不能超过一个 page 的大小**。当需要存储大对象时，DBMS 会将大对象单独存放在溢出页（overflow page）中，在原始记录里只保存一个指针。
+
+### （7）数据字典（Metadata）
+
+一个数据库有多张表，表的数据分布在若干 page 中。当执行 `SELECT * FROM student` 时，DBMS 如何知道该去读取哪个文件？
+
+每个 DBMS 都维护一个**数据字典**（data dictionary），用于存储数据库的元数据，包括表、索引与对应文件的映射关系。例如在 PostgreSQL 中，可以通过系统表查询：
+
+```sql
+SELECT 
+    tablename,
+    pg_relation_filepath(schemaname||'.'||tablename) AS file_path
+FROM pg_tables 
+WHERE tablename = 'student'
+  AND schemaname = 'public';
+-- 结果示例：student, base/16384/16454
+```
+
+### （8）内存、缓冲池与磁盘
+
+由于磁盘 I/O 代价极高，DBMS 在内存中维护一个**缓冲池**（buffer pool）来缓存磁盘上的 page。其核心机制包括：
+
+- **Page Table**：记录当前哪些 page 已被加载到内存，以及它们在内存中的位置。
+- **缓冲替换策略**（Buffer Replacement Policy）：当缓冲池满了需要腾出空间时，决定换出哪个 page。常见策略包括 LRU（最近最少使用）、Clock 等。
