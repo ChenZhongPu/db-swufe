@@ -317,6 +317,23 @@ DBMS 将数据库存储为若干文件（尽管使用自定义格式，连操作
 - OS page：一般是 4 KB
 - DB page：4 KB–16 KB（例如 SQLite 4 KB、PostgreSQL 8 KB、MySQL InnoDB 16 KB）
 
+实战：
+
+```sql
+-- 查看 page 大小
+SHOW block_size;
+
+CREATE TABLE storage_test (id serial, data text);
+INSERT INTO storage_test (data)
+  SELECT gen_random_uuid()::text FROM generate_series(1, 1000);
+
+-- 找到数据文件路径
+SELECT pg_relation_filepath('storage_test');
+
+-- 查看文件大小（应该是 8KB 的整数倍）
+SELECT pg_size_pretty(pg_relation_size('storage_test'));
+```
+
 ### （3）Page 的组织
 
 DBMS 可以使用不同的方式组织 pages：
@@ -340,11 +357,14 @@ DBMS 可以使用不同的方式组织 pages：
 
 **定长元组的 page layout**：如果元组都是定长的，最大的难点是如何记录被删除的元组。一种方案是使用 *free list*：维护一个链表，记录哪些槽位已被释放可以复用。
 
-**变长元组的 page layout**：当数据含有变长字段（如 `varchar`、`text`）时，通常使用 $(offset, length)$ 来标记变长字段的位置。为了高效管理变长元组，最常用的结构是**分槽页**（slotted pages）：使用一个 slot array 记录每个元组的起始位置和大小，元组从 page 尾部向前增长，slot array 从头部向后增长，中间是空闲空间。
+**变长元组的 page layout**：当数据含有变长字段（如 `varchar`、`text`）时，通常使用 $(offset, length)$ 来标记变长字段的位置。下面是`(id, name, dept_name, salary)`，其中仅`salary`是定长字段：
 
-```
-| Header | Slot1 | Slot2 | Slot3 | ... free space ... | Tuple#3 | Tuple#2 | Tuple#1 |
-```
+![page-layout](page-layout.png)
+
+
+为了高效管理变长元组，最常用的结构是**分槽页**（slotted pages）：使用一个 slot array 记录每个元组的起始位置和大小，元组从 page 尾部向前增长，slot array 从头部向后增长，中间是空闲空间。
+
+![slot](slot.png)
 
 PostgreSQL 的 slotted page 设计可参考：<https://www.postgresql.org/docs/current/storage-page-layout.html>
 
@@ -365,6 +385,15 @@ DBMS 通常会给每个逻辑元组分配一个**物理元组 ID**（physical tu
 SELECT CTID FROM student;
 ```
 
+实战：
+```sql
+SELECT ctid, id FROM storage_test LIMIT 5;
+
+-- 更新一行，观察 CTID 是否改变
+UPDATE storage_test SET data = 'changed' WHERE id = 3;
+SELECT ctid, id FROM storage_test WHERE id = 3;
+```
+
 ### （6）大对象存储
 
 SQL 支持 `blob`（二进制大对象）和 `clob`（字符大对象）类型。然而，很多 DBMS 要求**记录的大小不能超过一个 page 的大小**。当需要存储大对象时，DBMS 会将大对象单独存放在溢出页（overflow page）中，在原始记录里只保存一个指针。
@@ -383,6 +412,10 @@ FROM pg_tables
 WHERE tablename = 'student'
   AND schemaname = 'public';
 -- 结果示例：student, base/16384/16454
+
+SELECT attname, atttypid::regtype, attlen, attnotnull
+FROM pg_attribute
+WHERE attrelid = 'storage_test'::regclass AND attnum > 0;
 ```
 
 ### （8）内存、缓冲池与磁盘
