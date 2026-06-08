@@ -25,8 +25,7 @@ select salary from instructor where salary < 75000;
 
 查询代价（Query Cost）是指执行一个查询所需的资源消耗，通常以时间或 I/O 操作次数来衡量。
 
-
->[!NOTE]
+> [!NOTE]
 > 如果数据在内存或SSD，IO并不是决定性因素。这时需要考虑CPU的开销。这里为了简化分析，我们仍然以磁盘IO为主，忽略CPU开销。
 
 ### 1. 线性扫描
@@ -48,7 +47,6 @@ $$ t_S + \frac{b_r}{2} \times t_T $$
 $$ (h_i + 1) \times (t_S + t_T ) $$
 
 其中，$h_i$ 是索引的高度（如果把空树高度看成-1）。
-
 
 ### 4. 聚簇索引B+树 + 在非Key上相等比较
 
@@ -105,7 +103,7 @@ B+ 树叶节点：Physics → [指针A, 指针B, 指针C]
 
 每条记录可能在不同的页，每次都需要重新寻道（seek + transfer），因此 $n$ 条记录就需要 $n$ 次 $(t_S + t_T)$，加上走 B+ 树的 $h_i$ 次，总代价为 $(h_i + n) \times (t_S + t_T)$。
 
-----
+---
 
 ## 实战
 
@@ -144,7 +142,7 @@ ANALYZE orders;
 ### 任务一：没有索引
 
 ```sql
-EXPLAIN ANALYZE
+EXPLAIN (ANALYZE, BUFFERS)
 SELECT *
 FROM orders
 WHERE status = 'cancelled';
@@ -154,7 +152,6 @@ WHERE status = 'cancelled';
 
 - 观察查询计划中是否出现：`Seq Scan`。如果出现，说明 PostgreSQL 对 orders 表进行了顺序扫描。
 - Rows Removed by Filter：表示扫描过程中被读取出来，但是不满足条件、最终被丢弃的行数。
-
 
 ### 任务二：在status上创建索引
 
@@ -170,14 +167,14 @@ SET enable_bitmapscan = off;
 比较下面的SQL：
 
 ```sql
-EXPLAIN ANALYZE
+EXPLAIN (ANALYZE, BUFFERS)
 SELECT *
 FROM orders
 WHERE status = 'cancelled';
 ```
 
 ```sql
-EXPLAIN ANALYZE
+EXPLAIN (ANALYZE, BUFFERS)
 SELECT *
 FROM orders
 WHERE status = 'paid';
@@ -186,3 +183,4 @@ WHERE status = 'paid';
 > 注意：即使已经建立了索引，PostgreSQL 也不一定会使用它。
 
 思考：为什么 `paid` 可能不使用索引？
+
