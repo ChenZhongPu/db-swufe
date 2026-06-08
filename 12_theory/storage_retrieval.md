@@ -334,6 +334,8 @@ SELECT pg_relation_filepath('storage_test');
 SELECT pg_size_pretty(pg_relation_size('storage_test'));
 ```
 
+一般来说，一条记录被存储在一个page中，不会跨页存储。
+
 ### （3）Page 的组织
 
 DBMS 可以使用不同的方式组织 pages：
@@ -396,7 +398,35 @@ SELECT ctid, id FROM storage_test WHERE id = 3;
 
 ### （6）大对象存储
 
-SQL 支持 `blob`（二进制大对象）和 `clob`（字符大对象）类型。然而，很多 DBMS 要求**记录的大小不能超过一个 page 的大小**。当需要存储大对象时，DBMS 会将大对象单独存放在溢出页（overflow page）中，在原始记录里只保存一个指针。
+> Many databases internally restrict the size of a record to be no larger than the size of a block.
+
+SQL 支持 `blob`（二进制大对象）和 `clob`（字符大对象）类型。然而，很多 DBMS 要求 **记录的大小不能超过一个 page 的大小** 。当需要存储大对象时，DBMS 会将大对象单独存放在溢出页（overflow page）中，在原始记录里只保存一个指针。
+
+PostgreSQL 的溢出页机制称为 **TOAST**（The Oversized-Attribute Storage Technique）。当某列数据超过约 2 KB 时，PostgreSQL 会自动将其压缩或移出到一个隐藏的 TOAST 表中，原始 page 只保留一个指针。每张表都对应一个 TOAST 表，可以通过 `pg_class.reltoastrelid` 找到。
+
+实战：
+
+```sql
+-- 1. 创建测试表
+CREATE TABLE toast_test (id serial, content text);
+
+-- 2. 插入小数据（不触发 TOAST）
+INSERT INTO toast_test (content) VALUES (repeat('a', 100));
+
+-- 3. 插入大数据（触发 TOAST，阈值约 2 KB）
+INSERT INTO toast_test (content) VALUES (repeat('x', 100000));
+
+-- 4. 查看记录的 CTID（大数据行与小数据行同在主表中）
+SELECT ctid, id, length(content) FROM toast_test;
+
+-- 5. 对比原始大小与实际存储大小
+--    未触发 TOAST 的行：stored_bytes ≈ original_bytes
+--    触发 TOAST 的行：stored_bytes << original_bytes
+SELECT id,
+       length(content)         AS original_bytes,
+       pg_column_size(content) AS stored_bytes
+FROM toast_test;
+```
 
 ### （7）数据字典（Metadata）
 
@@ -423,4 +453,4 @@ WHERE attrelid = 'storage_test'::regclass AND attnum > 0;
 由于磁盘 I/O 代价极高，DBMS 在内存中维护一个**缓冲池**（buffer pool）来缓存磁盘上的 page。其核心机制包括：
 
 - **Page Table**：记录当前哪些 page 已被加载到内存，以及它们在内存中的位置。
-- **缓冲替换策略**（Buffer Replacement Policy）：当缓冲池满了需要腾出空间时，决定换出哪个 page。常见策略包括 LRU（最近最少使用）、Clock 等。
+- **缓冲替换策略**（Buffer Replacement Policy）：当缓冲池满了需要腾出空间时，决定换出哪个 page。常见策略包括 LRU（最近最少使用）等。
