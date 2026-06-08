@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B+树点查询：聚簇索引(ID) vs 非聚簇索引(age)</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f1f5f9;padding:20px;min-width:860px}
+h1{text-align:center;font-size:1.1rem;font-weight:700;color:#0f172a;margin-bottom:4px}
+.subtitle{text-align:center;font-size:.75rem;color:#94a3b8;margin-bottom:12px;font-family:monospace}
+.ctrl-row{display:flex;gap:16px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+.ctrl-box{background:white;border-radius:12px;padding:9px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.ctrl-box label{font-size:.82rem;color:#475569;font-weight:500}
+.ctrl-box input[type=range]{width:90px;cursor:pointer}
+.badge{display:inline-block;font-weight:700;font-size:.88rem;padding:2px 9px;border-radius:20px;min-width:30px;text-align:center;border:1px solid}
+.badge-green{background:#f0fdf4;color:#15803d;border-color:#86efac}
+.badge-red{background:#fff1f2;color:#dc2626;border-color:#fca5a5}
+.btn{padding:5px 14px;border:none;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:600;transition:filter .15s,transform .1s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.97)}.btn:disabled{filter:opacity(.4);cursor:not-allowed}
+.btn-green{background:#16a34a;color:white}.btn-red{background:#dc2626;color:white}.btn-reset{background:#94a3b8;color:white}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel{background:white;border-radius:14px;padding:13px 11px;box-shadow:0 2px 8px rgba(0,0,0,.08);position:relative}
+.panel-title{font-size:.88rem;font-weight:700;text-align:center;color:#1e293b;margin-bottom:3px;padding-bottom:6px;border-bottom:3px solid}
+.panel-sub{font-size:.67rem;color:#94a3b8;text-align:center;margin:3px 0 8px}
+#cp .panel-title{border-bottom-color:#34d399}#np .panel-title{border-bottom-color:#f87171}
+.sec-lbl{font-size:.59rem;color:#94a3b8;text-align:center;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.root-wrap{display:flex;justify-content:center}
+.root-node{display:inline-flex;border:2px solid #a78bfa;background:#faf5ff;border-radius:6px;overflow:hidden}
+.rc{padding:3px 10px;font-size:.82rem;font-weight:700;color:#1e293b;border-right:1px solid #ddd6fe;transition:background .3s,color .3s}
+.rc:last-child{border-right:none}.rc.active{background:#7c3aed;color:white}
+.tree-gap{height:24px}
+.c-leaves-row{display:flex;justify-content:center;gap:6px}
+.c-leaf{flex:1;max-width:118px;border:2px solid;border-radius:8px;overflow:hidden;transition:box-shadow .35s}
+.c-leaf.found{box-shadow:0 0 0 3px rgba(16,185,129,.3),0 4px 14px rgba(16,185,129,.2)}
+.c-leaf-hdr{color:white;font-size:.62rem;font-weight:700;padding:3px 4px;text-align:center}
+.c-rec{display:grid;grid-template-columns:22px 1fr 22px;align-items:center;gap:2px;padding:2px 4px;border-bottom:1px solid #f1f5f9;transition:background .25s}
+.c-rec:last-child{border-bottom:none}
+.c-id{font-size:.72rem;font-weight:700;text-align:center;padding:1px 2px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:3px;transition:background .25s,color .25s,border-color .25s}
+.c-name{font-size:.65rem;color:#64748b;text-align:center;overflow:hidden;white-space:nowrap}
+.c-age{font-size:.68rem;color:#94a3b8;text-align:center}
+.c-rec.found{background:#f0fdf4}
+.c-rec.found .c-id{background:#dcfce7;color:#15803d;border-color:#86efac;font-weight:800}
+.divider{display:flex;align-items:center;gap:8px;margin:8px 0 5px}
+.div-line{flex:1;height:1px;background:#e2e8f0}
+.div-text{font-size:.6rem;color:#b0bad0;white-space:nowrap}
+.n-leaves-row{display:flex;justify-content:center;gap:6px}
+.n-leaf{flex:1;max-width:96px;border:2px solid #93c5fd;background:#f0f9ff;border-radius:8px;overflow:hidden}
+.n-leaf-hdr{background:#2563eb;color:white;font-size:.62rem;font-weight:700;padding:3px;text-align:center}
+.n-ent{display:flex;align-items:center;gap:3px;padding:2px 4px;border-bottom:1px solid #e0f2fe;transition:background .25s}
+.n-ent:last-child{border-bottom:none}
+.n-ent-key{font-size:.73rem;font-weight:700;color:#1e40af;min-width:20px;text-align:center}
+.n-ent-ptr{font-size:.67rem;font-weight:600;padding:1px 3px;border-radius:3px;border:1px solid;white-space:nowrap;transition:box-shadow .25s}
+.n-ent.active{background:#dbeafe}.n-ent.active .n-ent-key{font-weight:800}.n-ent.active .n-ent-ptr{box-shadow:0 0 0 2px #3b82f6}
+.n-data-row{display:flex;justify-content:center;gap:6px}
+.n-dp{flex:1;max-width:118px;border:2px solid;border-radius:8px;overflow:hidden;transition:box-shadow .35s}
+.n-dp.found{box-shadow:0 0 0 3px rgba(239,68,68,.25),0 4px 14px rgba(239,68,68,.15)}
+.n-dp-hdr{color:white;font-size:.62rem;font-weight:700;padding:3px 4px;text-align:center}
+.n-drec{display:grid;grid-template-columns:22px 1fr 22px;align-items:center;gap:2px;padding:2px 4px;border-bottom:1px solid #f1f5f9;transition:background .25s}
+.n-drec:last-child{border-bottom:none}
+.n-did{font-size:.72rem;font-weight:700;text-align:center;padding:1px 2px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:3px}
+.n-dname{font-size:.65rem;color:#64748b;text-align:center;overflow:hidden;white-space:nowrap}
+.n-dage{font-size:.68rem;color:#94a3b8;text-align:center;transition:color .25s,font-weight .25s}
+.n-drec.found{background:#fff1f2}
+.n-drec.found .n-dage{color:#dc2626;font-weight:800}
+.io-row{display:flex;align-items:center;justify-content:space-between;margin-top:9px;padding:5px 11px;background:#f8fafc;border-radius:8px;border:1px solid #f1f5f9}
+.io-lbl{font-size:.75rem;color:#64748b}
+.io-num{font-size:1.35rem;font-weight:800;color:#cbd5e1;transition:color .4s}
+.io-num.good{color:#16a34a}.io-num.bad{color:#dc2626}
+.explain{margin-top:7px;padding:6px 10px;background:#f8fafc;border-left:3px solid #cbd5e1;border-radius:0 6px 6px 0;font-size:.75rem;color:#475569;line-height:1.55;min-height:38px;transition:background .4s,border-color .4s}
+.explain.good{background:#f0fdf4;border-left-color:#4ade80}.explain.bad{background:#fff1f2;border-left-color:#f87171}
+.panel svg.overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;overflow:visible}
+.col-hdr{display:grid;grid-template-columns:22px 1fr 22px;gap:2px;padding:1px 4px 3px;font-size:.58rem;font-weight:600;color:#94a3b8;text-align:center;border-bottom:1px dashed #e2e8f0;margin:0 0 1px}
+</style>
+</head>
+<body>
+<h1>B+树点查询：聚簇索引(ID) vs 非聚簇索引(age)</h1>
+<div class="subtitle">CREATE TABLE instructor (ID INT PRIMARY KEY, name VARCHAR(20), age INT)&nbsp;&nbsp;&nbsp;
+&#x2022;&nbsp;同一年龄的学生可能分散在不同数据页</div>
+
+<div class="ctrl-row">
+  <div class="ctrl-box">
+    <label>&#x1F7E2; 聚簇索引&nbsp;ID =</label>
+    <input type="range" id="qID" min="1" max="16" value="7" style="accent-color:#16a34a" oninput="syncID()">
+    <span class="badge badge-green" id="vID">7</span>
+    <button class="btn btn-green" id="runC" onclick="runClustering()">&#9654; 查询</button>
+  </div>
+  <div class="ctrl-box">
+    <label>&#x1F534; 非聚簇索引&nbsp;age =</label>
+    <input type="range" id="qAge" min="21" max="34" value="21" style="accent-color:#dc2626" oninput="syncAge()">
+    <span class="badge badge-red" id="vAge">21</span>
+    <button class="btn btn-red" id="runN" onclick="runNonClustering()">&#9654; 查询</button>
+  </div>
+  <button class="btn btn-reset" onclick="resetAll()">&#8635; 重置</button>
+</div>
+
+<div class="grid">
+  <div class="panel" id="cp">
+    <div class="panel-title">聚簇索引 on ID（MySQL InnoDB 风格）</div>
+    <div class="panel-sub">叶节点直接存储完整记录 · 叶节点即数据页</div>
+    <div class="sec-lbl">根节点（separator keys = ID）</div>
+    <div class="root-wrap"><div class="root-node" id="c-root"></div></div>
+    <div class="tree-gap"></div>
+    <div class="sec-lbl">叶节点 = 数据页（完整记录：ID | name | age）</div>
+    <div class="c-leaves-row" id="c-leaves"></div>
+    <div class="io-row">
+      <span class="io-lbl">数据页 I/O 次数</span>
+      <span class="io-num" id="c-io">&#8212;</span>
+    </div>
+    <div class="explain" id="c-ex">执行查询后将显示分析结果。</div>
+    <svg class="overlay" id="c-svg"></svg>
+  </div>
+
+  <div class="panel" id="np">
+    <div class="panel-title">非聚簇索引 on age（PostgreSQL 风格）</div>
+    <div class="panel-sub">叶节点存 age + 指针 · 数据页按 ID 插入顺序排列</div>
+    <div class="sec-lbl">根节点（separator keys = age）</div>
+    <div class="root-wrap"><div class="root-node" id="n-root"></div></div>
+    <div class="tree-gap"></div>
+    <div class="sec-lbl">叶节点（索引项：age | 指针→数据页）</div>
+    <div class="n-leaves-row" id="n-leaves"></div>
+    <div class="divider">
+      <div class="div-line"></div>
+      <div class="div-text">指针 &#8594; 独立数据页（物理顺序 = 插入顺序，与 age 无关）</div>
+      <div class="div-line"></div>
+    </div>
+    <div class="sec-lbl">数据页（完整记录：ID | name | age）</div>
+    <div class="n-data-row" id="n-data"></div>
+    <div class="io-row">
+      <span class="io-lbl">数据页 I/O 次数</span>
+      <span class="io-num" id="n-io">&#8212;</span>
+    </div>
+    <div class="explain" id="n-ex">执行查询后将显示分析结果。</div>
+    <svg class="overlay" id="n-svg"></svg>
+  </div>
+</div>
+
+<script>
+// ── instructor 表：16条记录，年龄有重复且分散在不同页 ──────────────
+// 数据页按 ID 顺序存储（插入顺序）：P1=ID1-4, P2=ID5-8, P3=ID9-12, P4=ID13-16
+// 年龄刻意设计：同一 age 的记录分布在不同数据页，体现非聚簇索引的随机 I/O 问题
+const RECORDS = [
+  {id:1,  name:'Alice',  age:21},  // P1
+  {id:2,  name:'Bob',    age:27},  // P1
+  {id:3,  name:'Carol',  age:30},  // P1
+  {id:4,  name:'Dave',   age:34},  // P1
+  {id:5,  name:'Eve',    age:21},  // P2  ← age=21 也在 P2
+  {id:6,  name:'Frank',  age:25},  // P2
+  {id:7,  name:'Grace',  age:27},  // P2  ← age=27 也在 P2
+  {id:8,  name:'Hank',   age:33},  // P2
+  {id:9,  name:'Iris',   age:23},  // P3
+  {id:10, name:'Jake',   age:30},  // P3  ← age=30 也在 P3
+  {id:11, name:'Kate',   age:25},  // P3  ← age=25 也在 P3
+  {id:12, name:'Leo',    age:33},  // P3  ← age=33 也在 P3
+  {id:13, name:'Mia',    age:28},  // P4
+  {id:14, name:'Nick',   age:34},  // P4  ← age=34 也在 P4
+  {id:15, name:'Olivia', age:21},  // P4  ← age=21 还在 P4！
+  {id:16, name:'Paul',   age:28},  // P4
+];
+
+const BY_ID = {};
+RECORDS.forEach(r => BY_ID[r.id] = r);
+
+// 有效年龄列表（已排序）：21,23,25,27,28,30,33,34
+const ALL_AGES = [...new Set(RECORDS.map(r=>r.age))].sort((a,b)=>a-b);
+
+const PC = {
+  1:{bg:'#dbeafe',hdr:'#2563eb',border:'#93c5fd',text:'#1e40af'},
+  2:{bg:'#dcfce7',hdr:'#16a34a',border:'#86efac',text:'#14532d'},
+  3:{bg:'#ffedd5',hdr:'#ea580c',border:'#fdba74',text:'#7c2d12'},
+  4:{bg:'#ede9fe',hdr:'#7c3aed',border:'#c4b5fd',text:'#4c1d95'},
+};
+
+// ── 聚簇索引 on ID：叶节点 = 数据页，按 ID 排序 ──────────────────
+const C_PAGES = [
+  {id:1, recs:[1,2,3,4]},
+  {id:2, recs:[5,6,7,8]},
+  {id:3, recs:[9,10,11,12]},
+  {id:4, recs:[13,14,15,16]},
+];
+const C_ROOT_SEPS = [5,9,13];
+function cLeafOf(id){if(id<5)return 1;if(id<9)return 2;if(id<13)return 3;return 4;}
+
+// ── 非聚簇索引 on age：数据页按插入(ID)顺序，与 age 无关 ─────────
+const N_DATA_PAGES = [
+  {id:1, recs:[1,2,3,4]},
+  {id:2, recs:[5,6,7,8]},
+  {id:3, recs:[9,10,11,12]},
+  {id:4, recs:[13,14,15,16]},
+];
+
+// age → [{pageId, id}]（一个 age 可能对应多条记录，分布在不同页）
+const AGE_PTRS = {};
+N_DATA_PAGES.forEach(p => p.recs.forEach(id => {
+  const age = BY_ID[id].age;
+  if(!AGE_PTRS[age]) AGE_PTRS[age] = [];
+  AGE_PTRS[age].push({pageId:p.id, id});
+}));
+
+// 非聚簇索引叶节点（按 age, id 排序）：
+// Leaf1: (21,1→P1),(21,5→P2),(21,15→P4),(23,9→P3)   ← age=21 跨三页!
+// Leaf2: (25,6→P2),(25,11→P3),(27,2→P1),(27,7→P2)
+// Leaf3: (28,13→P4),(28,16→P4),(30,3→P1),(30,10→P3)
+// Leaf4: (33,8→P2),(33,12→P3),(34,4→P1),(34,14→P4)
+const N_LEAVES = [
+  {id:1, entries:[{age:21,id:1},{age:21,id:5},{age:21,id:15},{age:23,id:9}]},
+  {id:2, entries:[{age:25,id:6},{age:25,id:11},{age:27,id:2},{age:27,id:7}]},
+  {id:3, entries:[{age:28,id:13},{age:28,id:16},{age:30,id:3},{age:30,id:10}]},
+  {id:4, entries:[{age:33,id:8},{age:33,id:12},{age:34,id:4},{age:34,id:14}]},
+];
+const N_ROOT_SEPS = [25,28,33];
+function nLeafOf(age){if(age<25)return 1;if(age<28)return 2;if(age<33)return 3;return 4;}
+
+// ── 控件同步 ──────────────────────────────────────────────────
+function syncID(){
+  document.getElementById('vID').textContent = document.getElementById('qID').value;
+}
+function snapAge(){
+  const v=+document.getElementById('qAge').value;
+  return ALL_AGES.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a);
+}
+function syncAge(){
+  document.getElementById('vAge').textContent = snapAge();
+}
+
+// ── 构建 UI ───────────────────────────────────────────────────
+function buildRoot(ndId, seps, pfx){
+  const nd=document.getElementById(ndId);nd.innerHTML='';
+  seps.forEach(s=>{
+    const c=document.createElement('div');c.className='rc';c.id=pfx+s;c.textContent=s;nd.appendChild(c);
+  });
+}
+function colHdr(){
+  const h=document.createElement('div');h.className='col-hdr';
+  ['ID','name','age'].forEach(t=>{const d=document.createElement('div');d.textContent=t;h.appendChild(d);});
+  return h;
+}
+function buildCLeaves(){
+  const row=document.getElementById('c-leaves');row.innerHTML='';
+  C_PAGES.forEach(pg=>{
+    const c=PC[pg.id];
+    const box=document.createElement('div');box.className='c-leaf';box.id='c-lp'+pg.id;box.style.borderColor=c.border;
+    const hdr=document.createElement('div');hdr.className='c-leaf-hdr';hdr.style.background=c.hdr;
+    hdr.textContent='Leaf/Page '+pg.id;box.appendChild(hdr);
+    box.appendChild(colHdr());
+    pg.recs.forEach(id=>{
+      const r=BY_ID[id];
+      const row2=document.createElement('div');row2.className='c-rec';row2.id='c-rec-'+id;
+      const d1=document.createElement('div');d1.className='c-id';d1.textContent=r.id;
+      const d2=document.createElement('div');d2.className='c-name';d2.textContent=r.name;
+      const d3=document.createElement('div');d3.className='c-age';d3.textContent=r.age;
+      row2.appendChild(d1);row2.appendChild(d2);row2.appendChild(d3);box.appendChild(row2);
+    });
+    row.appendChild(box);
+  });
+}
+function buildNLeaves(){
+  const row=document.getElementById('n-leaves');row.innerHTML='';
+  N_LEAVES.forEach(leaf=>{
+    const box=document.createElement('div');box.className='n-leaf';box.id='n-ln'+leaf.id;
+    const hdr=document.createElement('div');hdr.className='n-leaf-hdr';hdr.textContent='Leaf '+leaf.id;box.appendChild(hdr);
+    leaf.entries.forEach(e=>{
+      const ptrs=AGE_PTRS[e.age];
+      const ptr=ptrs.find(p=>p.id===e.id);
+      const c=PC[ptr.pageId];
+      const ent=document.createElement('div');ent.className='n-ent';ent.id='n-ent-'+e.age+'-'+e.id;
+      const kEl=document.createElement('div');kEl.className='n-ent-key';kEl.textContent=e.age;
+      const pEl=document.createElement('div');pEl.className='n-ent-ptr';
+      pEl.style.cssText='background:'+c.bg+';color:'+c.text+';border-color:'+c.border;
+      pEl.textContent='\u2192P'+ptr.pageId;
+      ent.appendChild(kEl);ent.appendChild(pEl);box.appendChild(ent);
+    });
+    row.appendChild(box);
+  });
+}
+function buildNData(){
+  const row=document.getElementById('n-data');row.innerHTML='';
+  N_DATA_PAGES.forEach(pg=>{
+    const c=PC[pg.id];
+    const box=document.createElement('div');box.className='n-dp';box.id='n-dp'+pg.id;box.style.borderColor=c.border;
+    const hdr=document.createElement('div');hdr.className='n-dp-hdr';hdr.style.background=c.hdr;hdr.textContent='Page '+pg.id;box.appendChild(hdr);
+    box.appendChild(colHdr());
+    pg.recs.forEach(id=>{
+      const r=BY_ID[id];
+      const rec=document.createElement('div');rec.className='n-drec';rec.id='n-dr-'+id;
+      const d1=document.createElement('div');d1.className='n-did';d1.textContent=r.id;
+      const d2=document.createElement('div');d2.className='n-dname';d2.textContent=r.name;
+      const d3=document.createElement('div');d3.className='n-dage';d3.id='n-da-'+id;d3.textContent=r.age;
+      rec.appendChild(d1);rec.appendChild(d2);rec.appendChild(d3);box.appendChild(rec);
+    });
+    row.appendChild(box);
+  });
+}
+
+// ── SVG ───────────────────────────────────────────────────────
+function ensureMarker(svgId,color){
+  const svg=document.getElementById(svgId);if(!svg||svg.querySelector('defs'))return;
+  const ns='http://www.w3.org/2000/svg';
+  const defs=document.createElementNS(ns,'defs');const mk=document.createElementNS(ns,'marker');
+  mk.setAttribute('id','arr-'+svgId);mk.setAttribute('viewBox','0 0 10 10');
+  mk.setAttribute('refX','9');mk.setAttribute('refY','5');
+  mk.setAttribute('markerWidth','5');mk.setAttribute('markerHeight','5');mk.setAttribute('orient','auto');
+  const p=document.createElementNS(ns,'path');p.setAttribute('d','M 0 0 L 10 5 L 0 10 z');p.setAttribute('fill',color);
+  mk.appendChild(p);defs.appendChild(mk);svg.insertBefore(defs,svg.firstChild);
+}
+function panelOf(svgId){return document.getElementById(svgId==='c-svg'?'cp':'np');}
+function drawCurve(svgId,fromId,toId,color,cls,arrow){
+  const svg=document.getElementById(svgId);
+  const pr=panelOf(svgId).getBoundingClientRect();
+  const fe=document.getElementById(fromId);const te=document.getElementById(toId);
+  if(!svg||!fe||!te)return;
+  const fr=fe.getBoundingClientRect();const tr=te.getBoundingClientRect();
+  const x1=fr.left+fr.width/2-pr.left,y1=fr.bottom-pr.top;
+  const x2=tr.left+tr.width/2-pr.left,y2=tr.top-pr.top;
+  const my=(y1+y2)/2;
+  const ns='http://www.w3.org/2000/svg';const p=document.createElementNS(ns,'path');
+  p.setAttribute('d','M'+x1+','+y1+' C'+x1+','+my+' '+x2+','+my+' '+x2+','+y2);
+  p.setAttribute('stroke',color);p.setAttribute('stroke-width',arrow?'2':'1.5');
+  p.setAttribute('fill','none');p.setAttribute('opacity',arrow?'0.85':'0.5');
+  p.classList.add(cls);if(arrow)p.setAttribute('marker-end','url(#arr-'+svgId+')');
+  svg.appendChild(p);
+}
+function drawStaticLines(){
+  ['c-svg','n-svg'].forEach(svgId=>{
+    document.getElementById(svgId).querySelectorAll('.t-line').forEach(l=>l.remove());
+    const rootId=svgId==='c-svg'?'c-root':'n-root';
+    const pfx=svgId==='c-svg'?'c-lp':'n-ln';
+    for(let i=1;i<=4;i++) drawCurve(svgId,rootId,pfx+i,'#c8d5e8','t-line',false);
+  });
+}
+
+// ── 重置 ──────────────────────────────────────────────────────
+function resetAll(){
+  document.querySelectorAll('.rc').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.c-leaf').forEach(e=>e.classList.remove('found'));
+  document.querySelectorAll('.c-rec').forEach(e=>e.classList.remove('found'));
+  document.querySelectorAll('.n-ent').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.n-dp').forEach(e=>e.classList.remove('found'));
+  document.querySelectorAll('.n-drec').forEach(e=>e.classList.remove('found'));
+  ['c-svg','n-svg'].forEach(id=>document.getElementById(id).querySelectorAll('.q-line').forEach(l=>l.remove()));
+  ['c','n'].forEach(p=>{
+    const io=document.getElementById(p+'-io');io.textContent='\u2014';io.className='io-num';
+    const ex=document.getElementById(p+'-ex');ex.textContent='执行查询后将显示分析结果。';ex.className='explain';
+  });
+  document.getElementById('runC').disabled=false;
+  document.getElementById('runN').disabled=false;
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// ── 聚簇查询（on ID）───────────────────────────────────────────
+async function runClustering(){
+  document.querySelectorAll('#cp .rc').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.c-leaf').forEach(e=>e.classList.remove('found'));
+  document.querySelectorAll('.c-rec').forEach(e=>e.classList.remove('found'));
+  document.getElementById('c-svg').querySelectorAll('.q-line').forEach(l=>l.remove());
+  document.getElementById('c-io').textContent='\u2014';document.getElementById('c-io').className='io-num';
+  document.getElementById('c-ex').textContent='执行查询后将显示分析结果。';document.getElementById('c-ex').className='explain';
+  document.getElementById('runC').disabled=true;
+
+  const id=+document.getElementById('qID').value;
+  const leafId=cLeafOf(id);
+  const rec=BY_ID[id];
+
+  await sleep(200);
+  const sep=C_ROOT_SEPS[leafId-2];
+  if(sep!==undefined){const ce=document.getElementById('cr-k'+sep);if(ce)ce.classList.add('active');}
+  await sleep(350);
+  drawCurve('c-svg','c-root','c-lp'+leafId,'#16a34a','q-line',true);
+  await sleep(400);
+  document.getElementById('c-lp'+leafId)?.classList.add('found');
+  document.getElementById('c-rec-'+id)?.classList.add('found');
+  await sleep(250);
+  const cIO=document.getElementById('c-io');cIO.textContent=1;cIO.className='io-num good';
+  const cEx=document.getElementById('c-ex');cEx.className='explain good';
+  cEx.innerHTML='查询 <strong>ID='+id+'</strong>（'+rec.name+'，age='+rec.age+'）。'
+    +'B+树定位到 Leaf/Page '+leafId+'，叶节点即数据页，直接读出完整记录。<strong>仅需 1 次数据页 I/O</strong>。';
+  document.getElementById('runC').disabled=false;
+}
+
+// ── 非聚簇查询（on age）── 可能返回多条记录，分散在不同页 ──────────
+async function runNonClustering(){
+  document.querySelectorAll('#np .rc').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.n-ent').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.n-dp').forEach(e=>e.classList.remove('found'));
+  document.querySelectorAll('.n-drec').forEach(e=>e.classList.remove('found'));
+  document.getElementById('n-svg').querySelectorAll('.q-line').forEach(l=>l.remove());
+  document.getElementById('n-io').textContent='\u2014';document.getElementById('n-io').className='io-num';
+  document.getElementById('n-ex').textContent='执行查询后将显示分析结果。';document.getElementById('n-ex').className='explain';
+  document.getElementById('runN').disabled=true;
+
+  const age=snapAge();
+  document.getElementById('vAge').textContent=age;
+
+  const matches=AGE_PTRS[age]||[];         // [{pageId, id}, ...]
+  const leafId=nLeafOf(age);
+
+  await sleep(200);
+  const sep=N_ROOT_SEPS[leafId-2];
+  if(sep!==undefined){const ne=document.getElementById('nr-k'+sep);if(ne)ne.classList.add('active');}
+
+  await sleep(350);
+  drawCurve('n-svg','n-root','n-ln'+leafId,'#3b82f6','q-line',true);
+
+  // 高亮叶节点中所有匹配的索引项
+  await sleep(400);
+  matches.forEach(m=>{
+    const ent=document.getElementById('n-ent-'+age+'-'+m.id);
+    if(ent)ent.classList.add('active');
+  });
+
+  // 对每个不同的数据页，画箭头并高亮匹配记录
+  const distinctPages=[...new Set(matches.map(m=>m.pageId))];
+  for(const pid of distinctPages){
+    await sleep(420);
+    drawCurve('n-svg','n-ln'+leafId,'n-dp'+pid,'#ef4444','q-line',true);
+    await sleep(360);
+    document.getElementById('n-dp'+pid)?.classList.add('found');
+    matches.filter(m=>m.pageId===pid).forEach(m=>{
+      document.getElementById('n-dr-'+m.id)?.classList.add('found');
+    });
+  }
+
+  await sleep(250);
+  const nIO=document.getElementById('n-io');
+  const k=distinctPages.length;
+  nIO.textContent=k;
+  nIO.className='io-num '+(k>1?'bad':'');
+
+  const names=matches.map(m=>BY_ID[m.id].name).join('、');
+  const pageList=distinctPages.map(p=>'P'+p).join('、');
+  const nEx=document.getElementById('n-ex');
+  nEx.className='explain '+(k>1?'bad':'');
+  nEx.innerHTML='查询 <strong>age='+age+'</strong>，共 <strong>'+matches.length+'</strong> 条记录'
+    +'（'+names+'）。'
+    +(k>1
+      ? '记录分散在 '+pageList+' 共 <strong>'+k+'</strong> 个不同数据页，每页需单独随机 I/O。<strong>共需 '+k+' 次数据页 I/O</strong>。'
+      : '记录恰好在同一页（'+pageList+'），<strong>仅需 1 次数据页 I/O</strong>（仍需先读索引页）。');
+  document.getElementById('runN').disabled=false;
+}
+
+// ── 初始化 ────────────────────────────────────────────────────
+function init(){
+  buildRoot('c-root',C_ROOT_SEPS,'cr-k');
+  buildRoot('n-root',N_ROOT_SEPS,'nr-k');
+  buildCLeaves();buildNLeaves();buildNData();
+  ensureMarker('c-svg','#16a34a');ensureMarker('n-svg','#ef4444');
+  requestAnimationFrame(drawStaticLines);
+}
+window.addEventListener('resize',drawStaticLines);
+init();
+</script>
+</body>
+</html>

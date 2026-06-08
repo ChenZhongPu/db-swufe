@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B+树索引与查询代价可视化</title>
+  <style>
+    :root {
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --border-color: #cbd5e1;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      
+      --color-primary: #2563eb;       /* Royal Blue */
+      --color-primary-light: #eff6ff;
+      --color-index: #4f46e5;         /* Indigo */
+      --color-index-light: #f5f3ff;
+      --color-data: #059669;          /* Emerald Green */
+      --color-data-light: #f0fdf4;
+      --color-active: #d97706;        /* Amber */
+      
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 16px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    /* Table Schema Banner */
+    .schema-section {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .schema-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .schema-code {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #0f172a;
+      white-space: pre-wrap;
+    }
+
+    /* SQL Selector Row */
+    .query-selector-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .query-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .query-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      transition: all 0.15s ease;
+    }
+
+    .query-btn:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    .query-btn.active {
+      background: var(--color-primary-light);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    /* Tab Buttons for Visualizer */
+    .tab-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 2px;
+      margin-top: 10px;
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+
+    /* Visual Workspace */
+    .visual-workspace {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      height: 580px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 30px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .tab-content {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* SVG Link Overlay */
+    .svg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Level Rows */
+    .level {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .level-root {
+      margin-top: 10px;
+    }
+
+    .level-leaves {
+      margin-top: 15px;
+    }
+
+    .node-title-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: center;
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    /* B+ Tree Index Node */
+    .tree-node {
+      background: #ffffff;
+      border: 2px solid var(--color-index);
+      border-radius: 6px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .tree-node.active-node {
+      border-color: var(--color-active);
+      box-shadow: 0 0 10px rgba(217, 119, 6, 0.25);
+      transform: scale(1.03);
+    }
+
+    .ptr-cell {
+      width: 20px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 0.65rem;
+      border-right: 1px solid var(--border-color);
+      cursor: default;
+    }
+
+    .ptr-cell:last-child {
+      border-right: none;
+      border-left: 1px solid var(--border-color);
+    }
+
+    .ptr-cell.active-ptr {
+      color: var(--color-active);
+      font-weight: bold;
+    }
+
+    .key-cell {
+      padding: 6px 12px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      background: #ffffff;
+      color: var(--text-main);
+      border-right: 1px solid var(--border-color);
+    }
+
+    .key-cell.active-key {
+      background: #fef3c7;
+      color: var(--color-active);
+    }
+
+    /* Index Leaf Node (Secondary index) */
+    .index-leaf-node {
+      border-color: #3b82f6;
+      width: 190px;
+      flex-direction: column;
+    }
+
+    .index-entry-row {
+      display: flex;
+      font-size: 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 4px 8px;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .index-entry-row:last-child {
+      border-bottom: none;
+    }
+
+    .index-entry-row.active-entry {
+      background: #fef3c7;
+    }
+
+    .index-key-val {
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .index-ptr-val {
+      font-family: var(--font-mono);
+      background: #f8fafc;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      border: 1px solid #e2e8f0;
+    }
+
+    .index-entry-row.active-entry .index-ptr-val {
+      background: var(--color-active);
+      color: #ffffff;
+      border-color: var(--color-active);
+    }
+
+    /* Data Pages (Leaf nodes in clustered, separate heap in non-clustered) */
+    .data-page {
+      border: 2px solid var(--color-data);
+      border-radius: 6px;
+      background: #ffffff;
+      width: 210px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s;
+    }
+
+    .data-page.active-page {
+      border-color: var(--color-active);
+      box-shadow: 0 0 10px rgba(217, 119, 6, 0.25);
+    }
+
+    .page-header {
+      background: var(--color-data-light);
+      color: #065f46;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+      letter-spacing: 0.05em;
+    }
+
+    .page-header.non-clustered {
+      background: #f0fdf4;
+    }
+
+    .record-row {
+      display: flex;
+      font-size: 0.75rem;
+      padding: 5px 8px;
+      border-bottom: 1px solid #e2e8f0;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .record-row:last-child {
+      border-bottom: none;
+    }
+
+    .record-row.checking {
+      background: #fef3c7;
+      outline: 1px solid var(--color-active);
+    }
+
+    .record-row.match {
+      background: #d1fae5;
+      color: #065f46;
+      font-weight: 600;
+    }
+
+    .col-id {
+      font-weight: 700;
+      color: var(--color-index);
+      width: 20px;
+    }
+
+    .col-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0 4px;
+      color: #334155;
+    }
+
+    .col-age {
+      font-weight: 700;
+      color: #0284c7;
+      width: 20px;
+      text-align: right;
+    }
+
+    /* Heap boundary for non-clustering view */
+    .heap-boundary {
+      border: 1px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #fafafa;
+      position: relative;
+    }
+
+    .heap-label {
+      position: absolute;
+      top: -9px;
+      left: 15px;
+      background: #fafafa;
+      padding: 0 6px;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Playback Controls & Stats HUD */
+    .sim-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 12px;
+      margin-top: 5px;
+    }
+
+    .sim-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .action-btn:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .action-btn-primary {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .action-btn-primary:hover:not(:disabled) {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    .stats-hud {
+      display: flex;
+      gap: 12px;
+    }
+
+    .stat-box {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      color: #475569;
+    }
+
+    .stat-val {
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--color-primary);
+    }
+
+    /* SVG Link paths styling */
+    .static-path {
+      stroke: #cbd5e1;
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    .flow-path {
+      stroke: var(--color-active);
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-dasharray: 6, 4;
+      animation: dash-flow 1.2s linear infinite;
+    }
+
+    @keyframes dash-flow {
+      to {
+        stroke-dashoffset: -20;
+      }
+    }
+
+    /* Bottom analysis panels */
+    .analysis-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .analysis-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+
+    .formula-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+
+    .formula-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .formula-expr {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .math-process {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--color-primary);
+      margin-top: 4px;
+    }
+
+    .explain-text {
+      font-size: 0.85rem;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .explain-text p {
+      margin-bottom: 8px;
+    }
+
+    .explain-text ul {
+      margin-left: 18px;
+      margin-top: 4px;
+    }
+
+    /* Academic-style Terminal Console */
+    .console-log {
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      height: 160px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #334155;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-line {
+      display: flex;
+      gap: 6px;
+    }
+
+    .log-time {
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .log-text.info { color: #2563eb; }
+    .log-text.io { color: #4f46e5; font-weight: 600; }
+    .log-text.success { color: #059669; font-weight: 600; }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- Header -->
+  <header>
+    <h1>B+树索引与查询计划代价可视化</h1>
+    <div class="subtitle">通过物理层面的 I/O 路径模拟，对比聚簇索引与非聚簇索引的寻道开销</div>
+  </header>
+
+  <!-- Table Schema -->
+  <div class="schema-section">
+    <div class="schema-title">数据表定义</div>
+    <div class="schema-code">CREATE TABLE instructor (
+    ID INT PRIMARY KEY,      -- 聚簇索引 (Clustering Index)
+    name VARCHAR(20),
+    age INT                  -- 非聚簇索引 (Non-Clustering Index)
+);</div>
+  </div>
+
+  <!-- SQL Query Selector -->
+  <div class="query-selector-bar">
+    <span class="query-label">选择查询语句:</span>
+    <button class="query-btn active" onclick="selectQuery(1, 22)">Q1: SELECT * FROM instructor WHERE ID = 22;</button>
+    <button class="query-btn" onclick="selectQuery(2, 35)">Q2: SELECT * FROM instructor WHERE age = 35;</button>
+    <button class="query-btn" onclick="selectQuery(3, 35)">Q3: SELECT * FROM instructor WHERE age = 35; (强制全表扫描)</button>
+  </div>
+
+  <!-- Visual Tab Control -->
+  <div class="tab-container">
+    <div class="tab-buttons">
+      <button class="tab-btn active" id="tab-btn-clustered" onclick="switchTab('clustered')">聚簇索引结构 (ID)</button>
+      <button class="tab-btn" id="tab-btn-non-clustered" onclick="switchTab('non-clustered')">非聚簇索引结构 (age)</button>
+      <button class="tab-btn" id="tab-btn-linear" onclick="switchTab('linear')">全表扫描结构 (顺序)</button>
+    </div>
+  </div>
+
+  <!-- Physical Storage Canvas -->
+  <div class="visual-workspace">
+    
+    <!-- 1. Clustered Tab -->
+    <div class="tab-content active" id="tab-clustered">
+      <svg class="svg-overlay" id="svg-clustered"></svg>
+      
+      <!-- Root Node -->
+      <div class="level level-root">
+        <div class="node-title-label">B+ 树根节点 (索引页)</div>
+        <div class="tree-node" id="c-node-root">
+          <div class="ptr-cell" id="c-ptr-0">●</div>
+          <div class="key-cell" id="c-key-35">35</div>
+          <div class="ptr-cell" id="c-ptr-1">●</div>
+          <div class="key-cell" id="c-key-72">72</div>
+          <div class="ptr-cell" id="c-ptr-2">●</div>
+        </div>
+      </div>
+      
+      <!-- Leaves (Data Pages) -->
+      <div class="level level-leaves">
+        
+        <!-- Data Page 1 -->
+        <div class="data-page" id="c-page-1">
+          <div class="node-title-label" style="top:-20px;">叶节点 1 (数据页 1)</div>
+          <div class="page-header">PAGE 1 (IDs &lt; 35)</div>
+          <div class="record-row" id="c-rec-10">
+            <span class="col-id">10</span>
+            <span class="col-name">Srinivasan</span>
+            <span class="col-age">28</span>
+          </div>
+          <div class="record-row" id="c-rec-22">
+            <span class="col-id">22</span>
+            <span class="col-name">Wu</span>
+            <span class="col-age">35</span>
+          </div>
+        </div>
+
+        <!-- Data Page 2 -->
+        <div class="data-page" id="c-page-2">
+          <div class="node-title-label" style="top:-20px;">叶节点 2 (数据页 2)</div>
+          <div class="page-header">PAGE 2 (35 &le; ID &lt; 72)</div>
+          <div class="record-row" id="c-rec-35">
+            <span class="col-id">35</span>
+            <span class="col-name">Mozart</span>
+            <span class="col-age">28</span>
+          </div>
+          <div class="record-row" id="c-rec-43">
+            <span class="col-id">43</span>
+            <span class="col-name">Einstein</span>
+            <span class="col-age">56</span>
+          </div>
+          <div class="record-row" id="c-rec-58">
+            <span class="col-id">58</span>
+            <span class="col-name">El Said</span>
+            <span class="col-age">41</span>
+          </div>
+        </div>
+
+        <!-- Data Page 3 -->
+        <div class="data-page" id="c-page-3">
+          <div class="node-title-label" style="top:-20px;">叶节点 3 (数据页 3)</div>
+          <div class="page-header">PAGE 3 (IDs &ge; 72)</div>
+          <div class="record-row" id="c-rec-72">
+            <span class="col-id">72</span>
+            <span class="col-name">Gold</span>
+            <span class="col-age">35</span>
+          </div>
+          <div class="record-row" id="c-rec-81">
+            <span class="col-id">81</span>
+            <span class="col-name">Katz</span>
+            <span class="col-age">41</span>
+          </div>
+          <div class="record-row" id="c-rec-95">
+            <span class="col-id">95</span>
+            <span class="col-name">Brandt</span>
+            <span class="col-age">56</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. Non-Clustered Tab -->
+    <div class="tab-content" id="tab-non-clustered">
+      <svg class="svg-overlay" id="svg-non-clustered"></svg>
+      
+      <!-- Root Node -->
+      <div class="level level-root">
+        <div class="node-title-label">B+ 树根节点 (索引页)</div>
+        <div class="tree-node" id="nc-node-root">
+          <div class="ptr-cell" id="nc-ptr-0">●</div>
+          <div class="key-cell" id="nc-key-41">41</div>
+          <div class="ptr-cell" id="nc-ptr-1">●</div>
+        </div>
+      </div>
+
+      <!-- Leaves (Index Pages) -->
+      <div class="level level-leaves">
+        
+        <!-- Index Leaf 1 -->
+        <div class="tree-node index-leaf-node" id="nc-leaf-1">
+          <div class="node-title-label" style="top:-20px;">索引叶节点 1 (ages &lt; 41)</div>
+          <div class="page-header">INDEX LEAF 1</div>
+          <div class="index-entry-row" id="nc-entry-28-1">
+            <span class="index-key-val">age: 28</span>
+            <span class="index-ptr-val" id="nc-ptr-28-1">→ P1:S1</span>
+          </div>
+          <div class="index-entry-row" id="nc-entry-28-2">
+            <span class="index-key-val">age: 28</span>
+            <span class="index-ptr-val" id="nc-ptr-28-2">→ P2:S1</span>
+          </div>
+          <div class="index-entry-row" id="nc-entry-35-1">
+            <span class="index-key-val">age: 35</span>
+            <span class="index-ptr-val" id="nc-ptr-35-1">→ P1:S2</span>
+          </div>
+          <div class="index-entry-row" id="nc-entry-35-2">
+            <span class="index-key-val">age: 35</span>
+            <span class="index-ptr-val" id="nc-ptr-35-2">→ P3:S1</span>
+          </div>
+        </div>
+
+        <!-- Index Leaf 2 -->
+        <div class="tree-node index-leaf-node" id="nc-leaf-2">
+          <div class="node-title-label" style="top:-20px;">索引叶节点 2 (ages &ge; 41)</div>
+          <div class="page-header">INDEX LEAF 2</div>
+          <div class="index-entry-row" id="nc-entry-41-1">
+            <span class="index-key-val">age: 41</span>
+            <span class="index-ptr-val" id="nc-ptr-41-1">→ P2:S3</span>
+          </div>
+          <div class="index-entry-row" id="nc-entry-41-2">
+            <span class="index-key-val">age: 41</span>
+            <span class="index-ptr-val" id="nc-ptr-41-2">→ P3:S2</span>
+          </div>
+          <div class="index-entry-row" id="nc-entry-56-1">
+            <span class="index-key-val">age: 56</span>
+            <span class="index-ptr-val" id="nc-ptr-56-1">→ P2:S2</span>
+          </div>
+          <div class="index-entry-row" id="nc-entry-56-2">
+            <span class="index-key-val">age: 56</span>
+            <span class="index-ptr-val" id="nc-ptr-56-2">→ P3:S3</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Physical Data (Heap file) -->
+      <div class="level level-data heap-boundary">
+        <div class="heap-label">独立物理数据页 (物理仍以主键 ID 有序)</div>
+        
+        <!-- Data Page 1 -->
+        <div class="data-page" id="nc-page-1" style="width: 190px;">
+          <div class="page-header non-clustered">DATA PAGE 1</div>
+          <div class="record-row" id="nc-rec-10">
+            <span class="col-id">10</span>
+            <span class="col-name">Srinivasan</span>
+            <span class="col-age">28</span>
+          </div>
+          <div class="record-row" id="nc-rec-22">
+            <span class="col-id">22</span>
+            <span class="col-name">Wu</span>
+            <span class="col-age">35</span>
+          </div>
+        </div>
+
+        <!-- Data Page 2 -->
+        <div class="data-page" id="nc-page-2" style="width: 190px;">
+          <div class="page-header non-clustered">DATA PAGE 2</div>
+          <div class="record-row" id="nc-rec-35">
+            <span class="col-id">35</span>
+            <span class="col-name">Mozart</span>
+            <span class="col-age">28</span>
+          </div>
+          <div class="record-row" id="nc-rec-43">
+            <span class="col-id">43</span>
+            <span class="col-name">Einstein</span>
+            <span class="col-age">56</span>
+          </div>
+          <div class="record-row" id="nc-rec-58">
+            <span class="col-id">58</span>
+            <span class="col-name">El Said</span>
+            <span class="col-age">41</span>
+          </div>
+        </div>
+
+        <!-- Data Page 3 -->
+        <div class="data-page" id="nc-page-3" style="width: 190px;">
+          <div class="page-header non-clustered">DATA PAGE 3</div>
+          <div class="record-row" id="nc-rec-72">
+            <span class="col-id">72</span>
+            <span class="col-name">Gold</span>
+            <span class="col-age">35</span>
+          </div>
+          <div class="record-row" id="nc-rec-81">
+            <span class="col-id">81</span>
+            <span class="col-name">Katz</span>
+            <span class="col-age">41</span>
+          </div>
+          <div class="record-row" id="nc-rec-95">
+            <span class="col-id">95</span>
+            <span class="col-name">Brandt</span>
+            <span class="col-age">56</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. Linear Scan Tab -->
+    <div class="tab-content" id="tab-linear">
+      <div style="font-size: 0.85rem; text-align: center; color: var(--text-muted);">
+        线性顺序读取所有物理数据页，逐行比对条件
+      </div>
+      
+      <div class="level" style="margin-top: 50px;">
+        
+        <!-- Data Page 1 -->
+        <div class="data-page" id="l-page-1" style="width: 220px;">
+          <div class="page-header">DATA PAGE 1</div>
+          <div class="record-row" id="l-rec-10">
+            <span class="col-id">10</span>
+            <span class="col-name">Srinivasan</span>
+            <span class="col-age">28</span>
+          </div>
+          <div class="record-row" id="l-rec-22">
+            <span class="col-id">22</span>
+            <span class="col-name">Wu</span>
+            <span class="col-age">35</span>
+          </div>
+        </div>
+
+        <!-- Data Page 2 -->
+        <div class="data-page" id="l-page-2" style="width: 220px;">
+          <div class="page-header">DATA PAGE 2</div>
+          <div class="record-row" id="l-rec-35">
+            <span class="col-id">35</span>
+            <span class="col-name">Mozart</span>
+            <span class="col-age">28</span>
+          </div>
+          <div class="record-row" id="l-rec-43">
+            <span class="col-id">43</span>
+            <span class="col-name">Einstein</span>
+            <span class="col-age">56</span>
+          </div>
+          <div class="record-row" id="l-rec-58">
+            <span class="col-id">58</span>
+            <span class="col-name">El Said</span>
+            <span class="col-age">41</span>
+          </div>
+        </div>
+
+        <!-- Data Page 3 -->
+        <div class="data-page" id="l-page-3" style="width: 220px;">
+          <div class="page-header">DATA PAGE 3</div>
+          <div class="record-row" id="l-rec-72">
+            <span class="col-id">72</span>
+            <span class="col-name">Gold</span>
+            <span class="col-age">35</span>
+          </div>
+          <div class="record-row" id="l-rec-81">
+            <span class="col-id">81</span>
+            <span class="col-name">Katz</span>
+            <span class="col-age">41</span>
+          </div>
+          <div class="record-row" id="l-rec-95">
+            <span class="col-id">95</span>
+            <span class="col-name">Brandt</span>
+            <span class="col-age">56</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div></div>
+    </div>
+
+    <!-- Simulator Footer -->
+    <div class="sim-footer">
+      <div class="sim-buttons">
+        <button class="action-btn action-btn-primary" id="btn-play" onclick="startSim()">▶ 演示路径</button>
+        <button class="action-btn" id="btn-reset" onclick="resetSim()" disabled>重置</button>
+      </div>
+
+      <div class="stats-hud">
+        <div class="stat-box">读取索引块: <span class="stat-val" id="stat-idx-io">0</span></div>
+        <div class="stat-box">读取数据块: <span class="stat-val" id="stat-data-io">0</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Analysis Panels -->
+  <div class="analysis-panel">
+    
+    <!-- Left Panel: Cost Breakdown -->
+    <div class="panel-card">
+      <div class="panel-title">物理代价分析</div>
+      <div class="formula-box">
+        <div class="formula-title" id="formula-title-lbl">聚簇索引 Key 查询代价公式</div>
+        <div class="formula-expr" id="formula-expr-val">(h<sub>i</sub> + 1) × (t<sub>S</sub> + t<sub>T</sub>)</div>
+        <div class="math-process" id="formula-math-val">(1 + 1) × (4.0 + 0.1) = 8.2 ms</div>
+      </div>
+      <div class="explain-text" id="analysis-explain">
+        <p>从 B+ 树根节点出发定位到叶子节点：</p>
+        <ul>
+          <li>树高 $h_i = 1$，共读取 1 个索引页。</li>
+          <li>聚簇索引中，B+ 树的叶节点即为数据页。读取叶节点相当于读取数据，需要 1 次数据页读取。</li>
+          <li>每次读取代表一次随机 I/O，耗时为 $t_S$（寻道时间 4.0ms）+ $t_T$（页传输 0.1ms）。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right Panel: Trace Log -->
+    <div class="panel-card">
+      <div class="panel-title">查询执行轨迹日志</div>
+      <div class="console-log" id="sim-log">
+        <div class="log-line">
+          <span class="log-time">[00:00.0]</span>
+          <span class="log-text">系统就绪，点击“演示路径”开始跟踪物理页的访问路径。</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  let currentTab = 'clustered';
+  let activeQuery = 1; // 1, 2, 3
+  let activeVal = 22;
+  let running = false;
+  let timeouts = [];
+
+  // Hardware constants
+  const HI = 1;     // Tree height
+  const TS = 4.0;   // Seek time
+  const TT = 0.1;   // Transfer time
+  const BR_LARGE = 120; // Table blocks conceptually used for formula representation
+
+  const records = [
+    { id: 10, name: 'Srinivasan', age: 28, page: 1 },
+    { id: 22, name: 'Wu', age: 35, page: 1 },
+    { id: 35, name: 'Mozart', age: 28, page: 2 },
+    { id: 43, name: 'Einstein', age: 56, page: 2 },
+    { id: 58, name: 'El Said', age: 41, page: 2 },
+    { id: 72, name: 'Gold', age: 35, page: 3 },
+    { id: 81, name: 'Katz', age: 41, page: 3 },
+    { id: 95, name: 'Brandt', age: 56, page: 3 }
+  ];
+
+  function switchTab(tabName) {
+    if (running) return;
+    currentTab = tabName;
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.id === `tab-btn-${tabName}`);
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.toggle('active', content.id === `tab-${tabName}`);
+    });
+
+    updateCostAnalysis();
+    drawStaticLines();
+  }
+
+  function selectQuery(qId, val) {
+    if (running) return;
+    activeQuery = qId;
+    activeVal = val;
+
+    // Highlight button
+    document.querySelectorAll('.query-btn').forEach((btn, idx) => {
+      btn.classList.toggle('active', idx + 1 === qId);
+    });
+
+    // Auto switch tab to appropriate structure
+    if (qId === 1) {
+      switchTab('clustered');
+    } else if (qId === 2) {
+      switchTab('non-clustered');
+    } else {
+      switchTab('linear');
+    }
+
+    resetSim();
+  }
+
+  function updateCostAnalysis() {
+    const fTitle = document.getElementById('formula-title-lbl');
+    const fExpr = document.getElementById('formula-expr-val');
+    const fMath = document.getElementById('formula-math-val');
+    const fExplain = document.getElementById('analysis-explain');
+
+    if (currentTab === 'clustered') {
+      fTitle.innerText = "3. 聚簇索引 B+ 树 Key 等值查询代价";
+      fExpr.innerHTML = "(h<sub>i</sub> + 1) × (t<sub>S</sub> + t<sub>T</sub>)";
+      const cost = (HI + 1) * (TS + TT);
+      fMath.innerHTML = `(${HI} + 1) × (${TS} + ${TT}) = ${cost.toFixed(2)} ms`;
+      fExplain.innerHTML = `
+        <p>通过聚簇索引查询主键 (ID = 22)：</p>
+        <ul>
+          <li>第一步：定位 B+ 树分支，读取 1 个根节点（1 次 I/O）。</li>
+          <li>第二步：聚簇索引的叶节点就是物理数据页，直接读取叶节点 PAGE 1 并获取记录（1 次 I/O）。</li>
+          <li><strong>总数据页 I/O = 1，总索引页 I/O = 1，合计 2 次物理 I/O</strong>。</li>
+        </ul>
+      `;
+    } else if (currentTab === 'non-clustered') {
+      fTitle.innerText = "6. 非聚簇索引 B+ 树非 Key 等值查询代价";
+      fExpr.innerHTML = "(h<sub>i</sub> + n) × (t<sub>S</sub> + t<sub>T</sub>)";
+      const n = 2; // matches: ID=22 (P1) and ID=72 (P3)
+      const cost = (HI + n) * (TS + TT);
+      fMath.innerHTML = `(${HI} + ${n}) × (${TS} + ${TT}) = ${cost.toFixed(2)} ms`;
+      fExplain.innerHTML = `
+        <p>通过非聚簇索引查询字段 (age = 35)，共匹配 $n=2$ 条记录：</p>
+        <ul>
+          <li>第一步：定位 B+ 树分支，读取 1 个根节点（1 次 I/O）。</li>
+          <li>第二步：读取索引叶子节点 INDEX LEAF 1 获取这 2 个指针（1 次 I/O）。</li>
+          <li>第三步：这 2 个指针分别指向物理上<strong>不连续</strong>的 DATA PAGE 1 (ID 22) 和 DATA PAGE 3 (ID 72)，必须分别执行随机寻道读取这 2 个物理页（2 次 I/O）。</li>
+          <li><strong>总数据页 I/O = 2，总索引页 I/O = 2，合计 4 次物理 I/O</strong>。</li>
+        </ul>
+      `;
+    } else {
+      fTitle.innerText = "1. 线性全表扫描查询代价 (非 Key)";
+      fExpr.innerHTML = "t<sub>S</sub> + b<sub>r</sub> × t<sub>T</sub>";
+      // Visually we have 3 blocks, but formula conceptually scales to br = 120 blocks
+      const cost = TS + BR_LARGE * TT;
+      fMath.innerHTML = `${TS} + ${BR_LARGE} × ${TT} = ${cost.toFixed(2)} ms`;
+      fExplain.innerHTML = `
+        <p>无索引情况下，强制对字段进行匹配：</p>
+        <ul>
+          <li>由于 age 不是主键（可能有多个匹配行），无法中途停止，必须扫描所有的物理页。</li>
+          <li>整个扫描过程只需要 1 次寻道（$t_S$），之后磁头连续顺序读取所有数据块（$b_r \times t_T$）。</li>
+          <li>在包含 $b_r = ${BR_LARGE}$ 块的大表下，线性扫描传输代价会显著放大。</li>
+        </ul>
+      `;
+    }
+  }
+
+  function drawSVGLine(svgId, fromEl, toEl, active = false) {
+    const svg = document.getElementById(svgId);
+    if (!svg || !fromEl || !toEl) return;
+
+    const svgRect = svg.getBoundingClientRect();
+    const fromRect = fromEl.getBoundingClientRect();
+    const toRect = toEl.getBoundingClientRect();
+
+    const x1 = (fromRect.left + fromRect.width / 2) - svgRect.left;
+    const y1 = fromRect.bottom - svgRect.top;
+    const x2 = (toRect.left + toRect.width / 2) - svgRect.left;
+    const y2 = toRect.top - svgRect.top;
+
+    const dy = y2 - y1;
+    const cy = y1 + dy / 2;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${cy}, ${x2} ${cy}, ${x2} ${y2}`);
+    path.setAttribute('class', active ? 'flow-path' : 'static-path');
+
+    svg.appendChild(path);
+  }
+
+  function drawStaticLines() {
+    document.getElementById('svg-clustered').innerHTML = '';
+    document.getElementById('svg-non-clustered').innerHTML = '';
+
+    if (currentTab === 'clustered') {
+      const page1 = document.getElementById('c-page-1');
+      const page2 = document.getElementById('c-page-2');
+      const page3 = document.getElementById('c-page-3');
+
+      drawSVGLine('svg-clustered', document.getElementById('c-ptr-0'), page1);
+      drawSVGLine('svg-clustered', document.getElementById('c-ptr-1'), page2);
+      drawSVGLine('svg-clustered', document.getElementById('c-ptr-2'), page3);
+    } else if (currentTab === 'non-clustered') {
+      const leaf1 = document.getElementById('nc-leaf-1');
+      const leaf2 = document.getElementById('nc-leaf-2');
+
+      drawSVGLine('svg-non-clustered', document.getElementById('nc-ptr-0'), leaf1);
+      drawSVGLine('svg-non-clustered', document.getElementById('nc-ptr-1'), leaf2);
+
+      const links = [
+        { from: 'nc-ptr-28-1', to: 'nc-rec-10' },
+        { from: 'nc-ptr-28-2', to: 'nc-rec-35' },
+        { from: 'nc-ptr-35-1', to: 'nc-rec-22' },
+        { from: 'nc-ptr-35-2', to: 'nc-rec-72' },
+        { from: 'nc-ptr-41-1', to: 'nc-rec-58' },
+        { from: 'nc-ptr-41-2', to: 'nc-rec-81' },
+        { from: 'nc-ptr-56-1', to: 'nc-rec-43' },
+        { from: 'nc-ptr-56-2', to: 'nc-rec-95' }
+      ];
+
+      links.forEach(l => {
+        drawSVGLine('svg-non-clustered', document.getElementById(l.from), document.getElementById(l.to));
+      });
+    }
+  }
+
+  function log(text, type = '') {
+    const consoleLog = document.getElementById('sim-log');
+    const now = new Date();
+    const ms = String(now.getMilliseconds()).padStart(3, '0').substring(0, 2);
+    const sec = String(now.getSeconds()).padStart(2, '0');
+    const timeStr = `[${sec}.${ms}]`;
+
+    const logLine = document.createElement('div');
+    logLine.className = 'log-line';
+    logLine.innerHTML = `
+      <span class="log-time">${timeStr}</span>
+      <span class="log-text ${type}">${text}</span>
+    `;
+    consoleLog.appendChild(logLine);
+    consoleLog.scrollTop = consoleLog.scrollHeight;
+  }
+
+  function resetSim() {
+    timeouts.forEach(t => clearTimeout(t));
+    timeouts = [];
+    running = false;
+
+    document.getElementById('btn-play').disabled = false;
+    document.getElementById('btn-reset').disabled = true;
+
+    document.getElementById('stat-idx-io').innerText = '0';
+    document.getElementById('stat-data-io').innerText = '0';
+
+    document.querySelectorAll('.tree-node, .data-page').forEach(el => {
+      el.classList.remove('active-node', 'active-page');
+    });
+    document.querySelectorAll('.key-cell, .ptr-cell, .record-row, .index-entry-row').forEach(el => {
+      el.classList.remove('active-key', 'active-ptr', 'checking', 'match', 'active-entry');
+    });
+
+    drawStaticLines();
+    document.getElementById('sim-log').innerHTML = `
+      <div class="log-line">
+        <span class="log-time">[00.00]</span>
+        <span class="log-text">演示环境已重置。</span>
+      </div>
+    `;
+  }
+
+  function startSim() {
+    if (running) return;
+    running = true;
+    document.getElementById('btn-play').disabled = true;
+    document.getElementById('btn-reset').disabled = false;
+    document.getElementById('sim-log').innerHTML = '';
+
+    const stepDelay = 900;
+    let step = 0;
+    const atStep = () => step++ * stepDelay;
+
+    if (currentTab === 'clustered') {
+      runClusteredSim(atStep, stepDelay);
+    } else if (currentTab === 'non-clustered') {
+      runNonClusteredSim(atStep, stepDelay);
+    } else {
+      runLinearScanSim(atStep, stepDelay);
+    }
+  }
+
+  function runClusteredSim(atStep, delay) {
+    log("开始执行: SELECT * FROM instructor WHERE ID = 22;", "info");
+    
+    // Step 1
+    timeouts.push(setTimeout(() => {
+      log("读取 B+ 树根节点...", "info");
+      document.getElementById('c-node-root').classList.add('active-node');
+      document.getElementById('stat-idx-io').innerText = '1';
+      log("I/O 事件: 载入索引页 (I/O = 1)", "io");
+    }, atStep()));
+
+    // Step 2
+    timeouts.push(setTimeout(() => {
+      log("在根节点中比对 ID=22. 范围: 22 < 35. 决定前往左侧指针", "info");
+      document.getElementById('c-ptr-0').classList.add('active-ptr');
+      document.getElementById('c-key-35').classList.add('active-key');
+      drawSVGLine('svg-clustered', document.getElementById('c-ptr-0'), document.getElementById('c-page-1'), true);
+    }, atStep()));
+
+    // Step 3
+    timeouts.push(setTimeout(() => {
+      log("读取叶节点 (数据页 1)...", "info");
+      document.getElementById('c-page-1').classList.add('active-page');
+      document.getElementById('stat-data-io').innerText = '1';
+      log("I/O 事件: 载入叶数据页 PAGE 1 (I/O = 2)", "io");
+    }, atStep()));
+
+    // Step 4
+    timeouts.push(setTimeout(() => {
+      log("在 PAGE 1 中查找到 ID = 22", "info");
+      document.getElementById('c-rec-22').classList.add('match');
+      log("成功获取记录行: (22, 'Wu', 35)", "success");
+      log("查询结束。总 I/O: 1 索引页 + 1 数据页. 物理总耗时 = 2 × (4.0ms + 0.1ms) = 8.2ms.", "success");
+      running = false;
+      document.getElementById('btn-play').disabled = false;
+    }, atStep()));
+  }
+
+  function runNonClusteredSim(atStep, delay) {
+    log("开始执行: SELECT * FROM instructor WHERE age = 35;", "info");
+
+    // Step 1
+    timeouts.push(setTimeout(() => {
+      log("读取 B+ 树根节点...", "info");
+      document.getElementById('nc-node-root').classList.add('active-node');
+      document.getElementById('stat-idx-io').innerText = '1';
+      log("I/O 事件: 载入根索引页 (I/O = 1)", "io");
+    }, atStep()));
+
+    // Step 2
+    timeouts.push(setTimeout(() => {
+      log("比对 age = 35 于划分键 [41]. 范围: 35 < 41. 前往左侧分支", "info");
+      document.getElementById('nc-ptr-0').classList.add('active-ptr');
+      document.getElementById('nc-key-41').classList.add('active-key');
+      drawSVGLine('svg-non-clustered', document.getElementById('nc-ptr-0'), document.getElementById('nc-leaf-1'), true);
+    }, atStep()));
+
+    // Step 3
+    timeouts.push(setTimeout(() => {
+      log("读取索引叶子节点 INDEX LEAF 1...", "info");
+      document.getElementById('nc-leaf-1').classList.add('active-node');
+      document.getElementById('stat-idx-io').innerText = '2';
+      log("I/O 事件: 载入索引叶子页 (I/O = 2)", "io");
+    }, atStep()));
+
+    // Step 4
+    timeouts.push(setTimeout(() => {
+      log("扫描 INDEX LEAF 1 寻找 age = 35. 发现 2 个匹配索引条目：", "info");
+      document.getElementById('nc-entry-35-1').classList.add('active-entry');
+      document.getElementById('nc-entry-35-2').classList.add('active-entry');
+      log("条目 1 指向 PAGE 1 SLOT 2 (Wu)", "info");
+      log("条目 2 指向 PAGE 3 SLOT 1 (Gold)", "info");
+    }, atStep()));
+
+    // Step 5: Read Page 1
+    timeouts.push(setTimeout(() => {
+      log("跟踪条目 1 物理指针，读取 DATA PAGE 1...", "info");
+      drawSVGLine('svg-non-clustered', document.getElementById('nc-ptr-35-1'), document.getElementById('nc-rec-22'), true);
+      document.getElementById('nc-page-1').classList.add('active-page');
+      document.getElementById('nc-rec-22').classList.add('match');
+      document.getElementById('stat-data-io').innerText = '1';
+      log("I/O 事件: 载入数据页 DATA PAGE 1 (I/O = 3)", "io");
+      log("从 PAGE 1 获取完整记录: (22, 'Wu', 35)", "success");
+    }, atStep()));
+
+    // Step 6: Read Page 3
+    timeouts.push(setTimeout(() => {
+      log("跟踪条目 2 物理指针，读取 DATA PAGE 3...", "info");
+      drawSVGLine('svg-non-clustered', document.getElementById('nc-ptr-35-2'), document.getElementById('nc-rec-72'), true);
+      document.getElementById('nc-page-3').classList.add('active-page');
+      document.getElementById('nc-rec-72').classList.add('match');
+      document.getElementById('stat-data-io').innerText = '2';
+      log("I/O 事件: 载入数据页 DATA PAGE 3 (I/O = 4)", "io");
+      log("从 PAGE 3 获取完整记录: (72, 'Gold', 35)", "success");
+    }, atStep()));
+
+    // Step 7
+    timeouts.push(setTimeout(() => {
+      log("查询结束。由于数据分散物理存储，造成 2 次随机数据页读取。总 I/O: 2 索引页 + 2 数据页. 物理耗时 = 4 × 4.1ms = 16.4ms.", "success");
+      running = false;
+      document.getElementById('btn-play').disabled = false;
+    }, atStep()));
+  }
+
+  function runLinearScanSim(atStep, delay) {
+    log("开始执行: SELECT * FROM instructor WHERE age = 35; (顺序扫描)", "info");
+
+    // Scan Page 1
+    timeouts.push(setTimeout(() => {
+      document.getElementById('l-page-1').classList.add('active-page');
+      document.getElementById('stat-data-io').innerText = '1';
+      log("I/O 事件: 载入 DATA PAGE 1 (I/O = 1)", "io");
+    }, atStep()));
+
+    timeouts.push(setTimeout(() => {
+      log("扫描 PAGE 1 记录...", "info");
+      const r10 = document.getElementById('l-rec-10');
+      const r22 = document.getElementById('l-rec-22');
+      r10.classList.add('checking');
+      
+      setTimeout(() => {
+        r10.classList.remove('checking');
+        r22.classList.add('checking');
+        setTimeout(() => {
+          r22.classList.remove('checking');
+          r22.classList.add('match');
+          log("在 PAGE 1 匹配到: (22, 'Wu', 35)", "success");
+        }, delay / 3);
+      }, delay / 3);
+    }, atStep()));
+
+    // Scan Page 2
+    timeouts.push(setTimeout(() => {
+      document.getElementById('l-page-2').classList.add('active-page');
+      document.getElementById('stat-data-io').innerText = '2';
+      log("I/O 事件: 载入 DATA PAGE 2 (I/O = 2)", "io");
+    }, atStep()));
+
+    timeouts.push(setTimeout(() => {
+      log("扫描 PAGE 2 记录...", "info");
+      const r35 = document.getElementById('l-rec-35');
+      const r43 = document.getElementById('l-rec-43');
+      const r58 = document.getElementById('l-rec-58');
+      
+      r35.classList.add('checking');
+      setTimeout(() => {
+        r35.classList.remove('checking');
+        r43.classList.add('checking');
+        setTimeout(() => {
+          r43.classList.remove('checking');
+          r58.classList.add('checking');
+          setTimeout(() => {
+            r58.classList.remove('checking');
+          }, delay / 4);
+        }, delay / 4);
+      }, delay / 4);
+    }, atStep()));
+
+    // Scan Page 3
+    timeouts.push(setTimeout(() => {
+      document.getElementById('l-page-3').classList.add('active-page');
+      document.getElementById('stat-data-io').innerText = '3';
+      log("I/O 事件: 载入 DATA PAGE 3 (I/O = 3)", "io");
+    }, atStep()));
+
+    timeouts.push(setTimeout(() => {
+      log("扫描 PAGE 3 记录...", "info");
+      const r72 = document.getElementById('l-rec-72');
+      const r81 = document.getElementById('l-rec-81');
+      const r95 = document.getElementById('l-rec-95');
+
+      r72.classList.add('checking');
+      setTimeout(() => {
+        r72.classList.remove('checking');
+        r72.classList.add('match');
+        log("在 PAGE 3 匹配到: (72, 'Gold', 35)", "success");
+        
+        r81.classList.add('checking');
+        setTimeout(() => {
+          r81.classList.remove('checking');
+          r95.classList.add('checking');
+          setTimeout(() => {
+            r95.classList.remove('checking');
+          }, delay / 4);
+        }, delay / 4);
+      }, delay / 4);
+    }, atStep()));
+
+    // End
+    timeouts.push(setTimeout(() => {
+      log("扫描结束。读取了全部 3 个数据页。公式中大表估算代基于 br=120 块。", "success");
+      running = false;
+      document.getElementById('btn-play').disabled = false;
+    }, atStep()));
+  }
+
+  window.onload = () => {
+    updateCostAnalysis();
+    setTimeout(() => {
+      drawStaticLines();
+    }, 100);
+    window.addEventListener('resize', drawStaticLines);
+  };
+</script>
+
+</body>
+</html>

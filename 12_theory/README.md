@@ -15,7 +15,7 @@
 
 ```sql
 SELECT MAX(total_points) FROM E
-    WHERE games_played < 445 AND room_id == 15645 ;
+    WHERE games_played < 445 AND room_id = 15645 ;
 ```
 
 假设DBMS采用的是行式存储（row-oriented）。为了回答上述查询，DBMS需要从磁盘读取pages的数量是？（选择最合适的答案）
